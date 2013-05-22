@@ -1,0 +1,20 @@
+<package>
+  <description brief="pick_and_place_exercise">
+
+     pick_and_place_exercise
+
+  </description>
+  <author>Jnicho</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/pick_and_place_exercise</url>
+  <depend package="ar_pose"/>
+  <depend package="moveit_msgs"/>
+  <depend package="moveit_ros_manipulation"/>
+  <depend package="moveit_ros_move_group"/>
+  <depend package="moveit_ros_planning_interface"/>
+  <depend package="roscpp"/>
+
+</package>
+
+
