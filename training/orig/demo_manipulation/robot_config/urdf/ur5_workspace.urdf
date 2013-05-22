@@ -36,7 +36,7 @@
   <material name="blue_transparent">
     <color rgba="0 0.8 1 0.4"/>
   </material>
-  <link name="workcell_frame"/>
+  <link name="world_frame"/>
   <!-- property list -->
   <!-- instantiating arm and gripper -->
   <link name="base_link">
@@ -56,7 +56,7 @@
     <child link="shoulder_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.089159"/>
     <axis xyz="0.0 0.0 1.0"/>
-    <limit effort="10.0" lower="-6.2831853" upper="6.2831853" velocity="3.14159265"/>
+    <limit effort="10.0" lower="-2.3561944875" upper="2.3561944875" velocity="3.14159265"/>
     <dynamics damping="10" friction="0.1"/>
   </joint>
   <link name="shoulder_link">
@@ -82,7 +82,7 @@
     <child link="upper_arm_link"/>
     <origin rpy="0.0 1.570796325 0.0" xyz="0.0 0.13585 0.0"/>
     <axis xyz="0.0 1.0 0.0"/>
-    <limit effort="10.0" lower="-6.2831853" upper="6.2831853" velocity="3.14159265"/>
+    <limit effort="10.0" lower="-3.14159265" upper="3.14159265" velocity="3.14159265"/>
     <dynamics damping="10" friction="0.1"/>
   </joint>
   <link name="upper_arm_link">
@@ -109,7 +109,7 @@
     <child link="forearm_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.1197 0.425"/>
     <axis xyz="0.0 1.0 0.0"/>
-    <limit effort="10.0" lower="-6.2831853" upper="6.2831853" velocity="3.14159265"/>
+    <limit effort="10.0" lower="-0.62831853" upper="2.827433385" velocity="3.14159265"/>
     <dynamics damping="10" friction="0.1"/>
   </joint>
   <link name="forearm_link">
@@ -135,7 +135,7 @@
     <child link="wrist_1_link"/>
     <origin rpy="0.0 1.570796325 0.0" xyz="0.0 0.0 0.39225"/>
     <axis xyz="0.0 1.0 0.0"/>
-    <limit effort="10.0" lower="-6.2831853" upper="6.2831853" velocity="3.14159265"/>
+    <limit effort="10.0" lower="-3.14159265" upper="0.0314159265" velocity="3.14159265"/>
     <dynamics damping="10" friction="0.1"/>
   </joint>
   <link name="wrist_1_link">
@@ -162,7 +162,7 @@
     <child link="wrist_2_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.093 0.0"/>
     <axis xyz="0.0 0.0 1.0"/>
-    <limit effort="10.0" lower="-6.2831853" upper="6.2831853" velocity="3.14159265"/>
+    <limit effort="10.0" lower="-3.14159265" upper="3.14159265" velocity="3.14159265"/>
     <dynamics damping="10" friction="0.1"/>
   </joint>
   <link name="wrist_2_link">
@@ -189,7 +189,7 @@
     <child link="wrist_3_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.09465"/>
     <axis xyz="0.0 1.0 0.0"/>
-    <limit effort="10.0" lower="-6.2831853" upper="6.2831853" velocity="3.14159265"/>
+    <limit effort="10.0" lower="-4.712388975" upper="4.712388975" velocity="3.14159265"/>
     <dynamics damping="10" friction="0.1"/>
   </joint>
   <link name="wrist_3_link">
@@ -258,7 +258,7 @@
 				</geometry-->
       <origin rpy="0 0 0" xyz="0 0 -0.048"/>
       <geometry>
-        <mesh filename="package://mantis_config/config/meshes/vacuum_gripper_one_suction_cup.STL"/>
+        <mesh filename="package://robot_config/meshes/vacuum_gripper_single_suction_cup.STL"/>
       </geometry>
       <material name="silver">
         <color rgba="0.8 0.8 0.8 1"/>
@@ -302,7 +302,7 @@
     </collision>
   </link>
   <joint name="workcell_to_table_base2" type="fixed">
-    <parent link="workcell_frame"/>
+    <parent link="world_frame"/>
     <child link="table_base2"/>
     <origin rpy="0 0 0" xyz="-0.69375 0 0"/>
   </joint>
@@ -320,8 +320,8 @@
       <material name="blue_transparent"/>
     </collision>
   </link>
-  <joint name="workcell_frame_to_front_wall2" type="fixed">
-    <parent link="workcell_frame"/>
+  <joint name="world_frame_to_front_wall2" type="fixed">
+    <parent link="world_frame"/>
     <child link="front_wall2"/>
     <origin rpy="0 0 0" xyz="-1.3375 0 0.5"/>
   </joint>
@@ -339,8 +339,8 @@
       <material name="blue_transparent"/>
     </collision>
   </link>
-  <joint name="workcell_frame_to_left_wall2" type="fixed">
-    <parent link="workcell_frame"/>
+  <joint name="world_frame_to_left_wall2" type="fixed">
+    <parent link="world_frame"/>
     <child link="left_wall2"/>
     <origin rpy="0 0 0" xyz="-0.601 1.06 0.5"/>
   </joint>
@@ -358,8 +358,8 @@
       <material name="blue_transparent"/>
     </collision>
   </link>
-  <joint name="workcell_frame_to_right_wall2" type="fixed">
-    <parent link="workcell_frame"/>
+  <joint name="world_frame_to_right_wall2" type="fixed">
+    <parent link="world_frame"/>
     <child link="right_wall2"/>
     <origin rpy="0 0 0" xyz="-0.601 -1.06 0.5"/>
   </joint>
@@ -377,8 +377,8 @@
       <material name="blue_transparent"/>
     </collision>
   </link>
-  <joint name="workcell_frame_to_cover_part1" type="fixed">
-    <parent link="workcell_frame"/>
+  <joint name="world_frame_to_cover_part1" type="fixed">
+    <parent link="world_frame"/>
     <child link="cover_part1"/>
     <origin rpy="0 0 0" xyz="-0.042 -0.081 0.07"/>
   </joint>
@@ -396,8 +396,8 @@
       <material name="blue_transparent"/>
     </collision>
   </link>
-  <joint name="workcell_frame_to_cover_part2" type="fixed">
-    <parent link="workcell_frame"/>
+  <joint name="world_frame_to_cover_part2" type="fixed">
+    <parent link="world_frame"/>
     <child link="cover_part2"/>
     <origin rpy="0 0 0" xyz="-0.012 -0.465 0.07"/>
   </joint>
@@ -512,14 +512,14 @@
     <origin rpy="0 0 0.035" xyz="-0.981 0.19 0.5475"/>
   </joint>
   <!-- end of sensor definitions -->
-  <joint name="workcell_to_stand" type="fixed">
-    <parent link="workcell_frame"/>
+  <joint name="world_to_stand" type="fixed">
+    <parent link="world_frame"/>
     <child link="ur5_stand"/>
     <origin xyz="-0.238 0 0.1"/>
   </joint>
   <!-- end of arm-workcell link definitions -->
   <!-- arm-workcell joint definitions -->
-  <joint name="base_to_stand" type="fixed">
+  <joint name="stand_to_base" type="fixed">
     <parent link="ur5_stand"/>
     <child link="base_link"/>
     <origin rpy="0 0 2.355" xyz="0 0 0.1"/>
@@ -528,7 +528,7 @@
   <!-- arm-gripper coupling joint definitions -->
   <joint name="to_gripper" type="fixed">
     <parent link="ee_link"/>
-    <child link="tcp_frame"/>
+    <child link="gripper_frame"/>
     <origin rpy="-1.57 0 -1.57" xyz="0 0 0"/>
     <!-- 0 1.57 0 -->
   </joint>
