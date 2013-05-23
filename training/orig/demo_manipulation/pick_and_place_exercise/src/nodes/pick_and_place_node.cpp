@@ -11,6 +11,7 @@
 
 // ros headers
 #include <ros/ros.h>
+#include <actionlib/client/simple_action_client.h>
 #include <geometry_msgs/Transform.h>
 #include <geometry_msgs/Pose.h>
 #include <tf/transform_datatypes.h>
@@ -27,24 +28,52 @@
 #include <moveit_msgs/GetStateValidity.h>
 #include <moveit_msgs/DisplayRobotState.h>
 
-#include <manipulation_msgs/Grasp.h>
+// object manipulation headers
+#include <object_manipulation_msgs/GraspHandPostureExecutionAction.h>
 
 // global variables
-static const std::string PLANNING_SCENE_TOPIC = "planning_scene";
-static const std::string COLLISION_OBJECT_TOPIC = "collision_object";
-static const std::string ARM_GROUP_NAME = "manipulator";
-static const std::string TCP_LINK_NAME = "tcp_frame";
-static const std::string WRIST_LINK_NAME = "ee_link";
-static const std::string END_EFFECTOR_NAME = "vacuum_gripper";
-static const std::string WORLD_FRAME_ID= "world_frame";
-static const std::string COLLISION_OBJECT_ID = "tagged_box";
-static const tf::Vector3 BOX_SIZE = tf::Vector3(0.1f,0.1f,0.1f);
-static const tf::Transform BOX_START_TF = tf::Transform(tf::Quaternion::getIdentity(),tf::Vector3(-0.8f,0.2f,BOX_SIZE.getZ()/2.0f));
-static const tf::Transform BOX_END_TF = tf::Transform(tf::Quaternion::getIdentity(),tf::Vector3(-0.8f,-0.2f,BOX_SIZE.getZ()/2.0f));
-static const double RETREAT_DISTANCE = 0.05f;
-static const double APPROACH_DISTANCE = 0.05f;
+static const std::string GRASP_ACTION_SERVICE = "grasp_action";
+
+// ros parameters
+static std::string ARM_GROUP_NAME = "manipulator";
+static std::string TCP_LINK_NAME = "tcp_frame";
+static std::string WRIST_LINK_NAME = "ee_link";
+static std::string WORLD_FRAME_ID= "world_frame";
+static tf::Vector3 BOX_SIZE = tf::Vector3(0.1f,0.1f,0.1f);
+static tf::Transform BOX_PICK_TF = tf::Transform(tf::Quaternion::getIdentity(),tf::Vector3(-0.8f,0.2f,BOX_SIZE.getZ()/2.0f));
+static tf::Transform BOX_PLACE_TF = tf::Transform(tf::Quaternion::getIdentity(),tf::Vector3(-0.8f,-0.2f,BOX_SIZE.getZ()/2.0f));
+static double RETREAT_DISTANCE = 0.05f;
+static double APPROACH_DISTANCE = 0.05f;
 
 using namespace tf;
+
+bool read_ros_parameters()
+{
+	ros::NodeHandle nh("~");
+	double w, l, h, x, y;
+
+	if(nh.getParam("arm_group_name",ARM_GROUP_NAME)
+			&& nh.getParam("tcp_link_name",TCP_LINK_NAME)
+			&& nh.getParam("wrist_link_name",WRIST_LINK_NAME)
+			&& nh.getParam("world_frame_id",WORLD_FRAME_ID)
+			&& nh.getParam("box_width",w)
+			&& nh.getParam("box_length",l)
+			&& nh.getParam("box_height",h)
+			&& nh.getParam("box_place_x",x)
+			&& nh.getParam("box_place_y",y)
+			&& nh.getParam("retreat_distance",RETREAT_DISTANCE)
+			&& nh.getParam("approach_distance",APPROACH_DISTANCE))
+	{
+		BOX_SIZE = Vector3(l,w,h);
+		BOX_PLACE_TF.setOrigin(Vector3(x,y,h/2.0f));
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+}
 
 void create_manipulation_poses(double retreat_dis,double approach_dis,const tf::Transform &target_tf,std::vector<geometry_msgs::Pose> &poses)
 {
@@ -64,7 +93,6 @@ void create_manipulation_poses(double retreat_dis,double approach_dis,const tf::
 	poses.push_back(target_pose);
 	poses.push_back(end_pose);
 
-
 }
 
 int main(int argc,char** argv)
@@ -73,7 +101,6 @@ int main(int argc,char** argv)
 	/* =================================================
 	 * ROS SETUP
 	   ================================================= */
-
 	// ros initialization
 	ros::init(argc,argv,"pick_and_place_node");
 	ros::NodeHandle nh;
@@ -81,10 +108,25 @@ int main(int argc,char** argv)
 	tf::TransformListener tf_listener;
 	spinner.start();
 
+	// reading parameters
+	if(read_ros_parameters())
+	{
+		ROS_INFO_STREAM("Parameters successfully read");
+	}
+	else
+	{
+		ROS_ERROR_STREAM("Parameters not found");
+		return 0;
+	}
+
 	// moveit interface
 	move_group_interface::MoveGroup move_group(ARM_GROUP_NAME);
 
-	// box pose
+	// grasp action client
+	actionlib::SimpleActionClient<object_manipulation_msgs::GraspHandPostureExecutionAction> grasp_action_client(GRASP_ACTION_SERVICE,true);
+	object_manipulation_msgs::GraspHandPostureExecutionActionGoal grasp_goal;
+
+	// recognition service
 	geometry_msgs::Pose box_pose;
 
 	/* =================================================
@@ -101,7 +143,7 @@ int main(int argc,char** argv)
 	tf_listener.lookupTransform(TCP_LINK_NAME,WRIST_LINK_NAME,ros::Time(0.0f),tcp_to_wrist_tf);
 
 	// setting box pose at pick
-	tf::poseTFToMsg(BOX_START_TF,box_pose);
+	tf::poseTFToMsg(BOX_PICK_TF,box_pose);
 
 	// resolving wrist pose relative to world frame at pick
 	world_to_tcp_tf.setOrigin(tf::Vector3(box_pose.position.x,box_pose.position.y,BOX_SIZE.getZ()));
@@ -133,7 +175,7 @@ int main(int argc,char** argv)
 	std::vector<geometry_msgs::Pose> place_poses;
 
 	// setting box pose at place
-	tf::poseTFToMsg(BOX_END_TF,box_pose);
+	tf::poseTFToMsg(BOX_PLACE_TF,box_pose);
 
 	// resolving wrist pose in world at place
 	world_to_tcp_tf.setOrigin(tf::Vector3(box_pose.position.x,box_pose.position.y,BOX_SIZE.getZ()));
@@ -173,6 +215,7 @@ int main(int argc,char** argv)
 			ros::shutdown();
 			return 0;
 		}
+
 	}
 
 	/* =================================================
