@@ -1,14 +1,9 @@
 <?xml version="1.0"?>
 <launch>
 
-  <include file="$(find ur5_environment_moveit_config)/launch/moveit_planning_execution.launch">
-	<arg name="sim" value="true"/>
-	<!--arg name="robot_ip" value=""/-->
-  </include>
-
-  <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" 
-	args="-d $(find pick_and_place_exercise)/config/ur5/rviz_config.rviz" output="screen">
-    <rosparam command="load" file="$(find ur5_environment_moveit_config)/config/kinematics.yaml"/>
+  <!-- pick and place node -->
+  <node pkg="pick_and_place_exercise" type="pick_and_place_node" name="pick_and_place_node" output="screen">
+	<rosparam command="load" file="$(find pick_and_place_exercise)/config/ur5/pick_and_place_parameters.yaml"/>
   </node>
 
 </launch>
