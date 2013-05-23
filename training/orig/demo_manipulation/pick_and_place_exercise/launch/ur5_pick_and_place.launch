@@ -1,19 +1,9 @@
 <?xml version="1.0"?>
 <launch>
 
-  <include file="$(find ur5_environment_moveit_config)/launch/planning_context.launch">
-    <arg name="load_robot_description" value="true"/>
-  </include>
-
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-    <param name="/use_gui" value="false"/>
-  </node>
-  
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
-
-  <include file="$(find ur5_environment_moveit_config)/launch/move_group.launch">
-    <arg name="allow_trajectory_execution" value="false"/>
-    <arg name="publish_monitored_planning_scene" value="true"/>
+  <include file="$(find ur5_environment_moveit_config)/launch/moveit_planning_execution.launch">
+	<arg name="sim" value="true"/>
+	<!--arg name="robot_ip" value=""/-->
   </include>
 
   <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" 
