@@ -33,10 +33,6 @@
     <arg name="publish_monitored_planning_scene" value="true" />
   </include>
 
-  <include file="$(find ur5_environment_moveit_config)/launch/moveit_rviz.launch"/>
-  
-  <!--include file="$(find ur5_environment_moveit_config)/launch/warehouse.launch" /-->
-
   <rosparam command="load" file="$(find ur5_environment_moveit_config)/config/joint_names.yaml"/>
 
 </launch>
