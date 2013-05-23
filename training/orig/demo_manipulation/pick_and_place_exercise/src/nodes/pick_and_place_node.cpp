@@ -103,7 +103,7 @@ int main(int argc,char** argv)
 	// setting box pose at pick
 	tf::poseTFToMsg(BOX_START_TF,box_pose);
 
-	// resolving wrist pose in world at pick
+	// resolving wrist pose relative to world frame at pick
 	world_to_tcp_tf.setOrigin(tf::Vector3(box_pose.position.x,box_pose.position.y,BOX_SIZE.getZ()));
 	world_to_tcp_tf.setRotation(tf::Quaternion(M_PI,0,M_PI_2));
 	world_to_wrist_tf = world_to_tcp_tf * tcp_to_wrist_tf;
