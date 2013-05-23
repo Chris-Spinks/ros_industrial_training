@@ -32,7 +32,7 @@
 #include <object_manipulation_msgs/GraspHandPostureExecutionAction.h>
 
 // global variables
-static const std::string GRASP_ACTION_SERVICE = "grasp_action";
+static const std::string GRASP_ACTION_SERVICE = "grasp_execution_action";
 
 // ros parameters
 static std::string ARM_GROUP_NAME = "manipulator";
@@ -124,10 +124,17 @@ int main(int argc,char** argv)
 
 	// grasp action client
 	actionlib::SimpleActionClient<object_manipulation_msgs::GraspHandPostureExecutionAction> grasp_action_client(GRASP_ACTION_SERVICE,true);
-	object_manipulation_msgs::GraspHandPostureExecutionActionGoal grasp_goal;
+	object_manipulation_msgs::GraspHandPostureExecutionGoal grasp_goal;
 
 	// recognition service
 	geometry_msgs::Pose box_pose;
+
+	// waiting to establish connections
+	while(ros::ok() &&
+			( !grasp_action_client.waitForServer(ros::Duration(2.0f))))
+	{
+		ROS_INFO_STREAM("Waiting for servers");
+	}
 
 	/* =================================================
 	 * PICK MOVE SETUP
@@ -196,13 +203,30 @@ int main(int argc,char** argv)
 
 
 	/* =================================================
+	 * OPEN GRIPPER
+	   ================================================= */
+	grasp_goal.goal = object_manipulation_msgs::GraspHandPostureExecutionGoal::RELEASE;
+	grasp_action_client.sendGoal(grasp_goal);
+	if(grasp_action_client.waitForResult(ros::Duration(4.0f)))
+	{
+		ROS_INFO_STREAM("Gripper opened");
+	}
+	else
+	{
+		ROS_ERROR_STREAM("Gripper failure");
+		ros::shutdown();
+		return 0;
+	}
+
+
+	/* =================================================
 	 * MOVING ARM THROUGH PICK POSES
 	   ================================================= */
 
 	move_group.setEndEffectorLink(WRIST_LINK_NAME);
 	move_group.setPoseReferenceFrame(WORLD_FRAME_ID);
 
-	for(int i = 0; i < pick_poses.size(); i++)
+	for(unsigned int i = 0; i < pick_poses.size(); i++)
 	{
 		move_group.setPoseTarget(pick_poses[i],WRIST_LINK_NAME);
 		if(move_group.move())
@@ -216,6 +240,22 @@ int main(int argc,char** argv)
 			return 0;
 		}
 
+		if(i == 0) // turn on gripper suction after approach pose
+		{
+			grasp_goal.goal= object_manipulation_msgs::GraspHandPostureExecutionGoal::GRASP;
+			grasp_action_client.sendGoal(grasp_goal);
+			if(grasp_action_client.waitForResult(ros::Duration(4.0f)))
+			{
+				ROS_INFO_STREAM("Gripper closed");
+			}
+			else
+			{
+				ROS_ERROR_STREAM("Gripper failure");
+				ros::shutdown();
+				return 0;
+			}
+		}
+
 	}
 
 	/* =================================================
@@ -225,7 +265,7 @@ int main(int argc,char** argv)
 	move_group.setEndEffectorLink(WRIST_LINK_NAME);
 	move_group.setPoseReferenceFrame(WORLD_FRAME_ID);
 
-	for(int i = 0; i < place_poses.size(); i++)
+	for(unsigned int i = 0; i < place_poses.size(); i++)
 	{
 		move_group.setPoseTarget(place_poses[i],WRIST_LINK_NAME);
 		if(move_group.move())
@@ -237,6 +277,22 @@ int main(int argc,char** argv)
 			ROS_INFO_STREAM("Place Move " << i <<" Failed");
 			ros::shutdown();
 			return 0;
+		}
+
+		if(i == 1) // turn off gripper suction after target pose
+		{
+			grasp_goal.goal = object_manipulation_msgs::GraspHandPostureExecutionGoal::RELEASE;
+			grasp_action_client.sendGoal(grasp_goal);
+			if(grasp_action_client.waitForResult(ros::Duration(4.0f)))
+			{
+				ROS_INFO_STREAM("Gripper opened");
+			}
+			else
+			{
+				ROS_ERROR_STREAM("Gripper failure");
+				ros::shutdown();
+				return 0;
+			}
 		}
 	}
 
