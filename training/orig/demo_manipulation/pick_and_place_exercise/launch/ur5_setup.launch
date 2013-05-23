@@ -10,9 +10,10 @@
   </include>
 
   <!-- grasp action service (simulated) -->
-  <!--node if="$(arg sim)" pkg="robot_io" type="simulated_grasp_action_server" name="gripper_action_server" output="screen"/-->  
+  <node if="$(arg sim)" pkg="robot_io" type="simulated_grasp_action_server" name="gripper_action_server" output="screen"/>  
 
   <!-- grasp action service (real) -->
+  <include unless="$(arg sim)" file="$(find robot_io)/launch/robot_io.launch"/>
   <node unless="$(arg sim)" pkg="robot_io" type="suction_gripper_action_server" name="gripper_action_server" output="screen"/>
   <param unless="$(arg sim)" name="suction_on_output_channel" value="2"/>
   <param unless="$(arg sim)" name="suction_check_output_channel" value="1"/>
