@@ -6,7 +6,7 @@
  */
 
 #include <ros/ros.h>
-#include <mantis_io/DigitalOutputUpdate.h>
+#include <robot_io/DigitalOutputUpdate.h>
 #include <soem_beckhoff_drivers/DigitalMsg.h>
 
 static const std::string OUTPUT_TOPIC = "/digital_outputs";
@@ -33,7 +33,7 @@ public:
 		}
 	}
 
-	bool serviceCallback(mantis_io::DigitalOutputUpdate::Request &req,mantis_io::DigitalOutputUpdate::Response &res)
+	bool serviceCallback(robot_io::DigitalOutputUpdate::Request &req,robot_io::DigitalOutputUpdate::Response &res)
 	{
 		if(validateRequest(req))
 		{
@@ -66,8 +66,8 @@ public:
 		}
 
 		// initializing and sending output message
-		output_msg_.values.resize(mantis_io::DigitalOutputUpdate::Request::COUNT, false);
-		output_msg_.values[mantis_io::DigitalOutputUpdate::Request::COLLISION] = true;
+		output_msg_.values.resize(robot_io::DigitalOutputUpdate::Request::COUNT, false);
+		output_msg_.values[robot_io::DigitalOutputUpdate::Request::COLLISION] = true;
 		pub_.publish(output_msg_);
 	    ROS_INFO_STREAM(nodeName<<": Turning on air pressure to collision sensor");
 
@@ -95,7 +95,7 @@ protected:
 	  // messages
 	  soem_beckhoff_drivers::DigitalMsg output_msg_;
 
-	  bool validateRequest(const mantis_io::DigitalOutputUpdate::Request &req)
+	  bool validateRequest(const robot_io::DigitalOutputUpdate::Request &req)
 	  {
 		  if(req.bit_index >= req.COUNT|| req.bit_index == req.COLLISION)
 		  {

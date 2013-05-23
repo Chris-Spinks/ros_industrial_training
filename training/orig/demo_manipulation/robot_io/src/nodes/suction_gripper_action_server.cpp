@@ -34,14 +34,14 @@
 #include <actionlib/server/action_server.h>
 #include <object_manipulation_msgs/GraspHandPostureExecutionAction.h>
 #include <object_manipulation_msgs/GraspHandPostureExecutionGoal.h>
-#include <mantis_io/DigitalOutputUpdate.h>
+#include <robot_io/DigitalOutputUpdate.h>
 #include <soem_beckhoff_drivers/DigitalMsg.h>
 
 using namespace object_manipulation_msgs;
 using namespace actionlib;
 
 
-typedef mantis_io::DigitalOutputUpdate::Request DigitalOutputType;
+typedef robot_io::DigitalOutputUpdate::Request DigitalOutputType;
 
 static const std::string OUTPUT_TOPIC = "/digital_outputs";
 static const std::string INPUT_TOPIC = "/digital_inputs";
@@ -77,7 +77,7 @@ public:
 	    std::string nodeName = ros::this_node::getName();
 
 	    // service client
-	    service_client_ = pn.serviceClient<mantis_io::DigitalOutputUpdate>(OUTPUT_SERVICE);
+	    service_client_ = pn.serviceClient<robot_io::DigitalOutputUpdate>(OUTPUT_SERVICE);
 	    while(!service_client_.waitForExistence(ros::Duration(5.0f)))
 	    {
 	    	ROS_INFO_STREAM(nodeName<<": Waiting for "<<OUTPUT_SERVICE<<" to start");
@@ -110,8 +110,8 @@ private:
 
     ROS_INFO("%s",(nodeName + ": Received grasping goal").c_str());
 
-    mantis_io::DigitalOutputUpdate::Request req;
-    mantis_io::DigitalOutputUpdate::Response res;
+    robot_io::DigitalOutputUpdate::Request req;
+    robot_io::DigitalOutputUpdate::Response res;
     bool success;
 
 	switch(gh.getGoal()->goal)
@@ -218,7 +218,7 @@ private:
 
   bool validateChannelIndices()
   {
-	  typedef mantis_io::DigitalOutputUpdate::Request DigitalOutputType;
+	  typedef robot_io::DigitalOutputUpdate::Request DigitalOutputType;
 
 	  if(suction_on_output_channel_ >= (int)DigitalOutputType::COUNT || suction_on_output_channel_ == (int)DigitalOutputType::COLLISION)
 	  {
