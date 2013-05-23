@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="sim" default="true"/>
+  <arg name="robot_ip" unless="$(arg sim)"/>
+
+  <!-- moveit components -->
+  <include file="$(find ur5_environment_moveit_config)/launch/moveit_planning_execution.launch">
+	<arg name="sim" value="true"/>
+	<arg unless="$(arg sim)" name="robot_ip" value="$(arg robot_ip)"/>
+  </include>
+
+  <!-- grasp action service (simulated) -->
+  <!--node if="$(arg sim)" pkg="robot_io" type="simulated_grasp_action_server" name="gripper_action_server" output="screen"/-->  
+
+  <!-- grasp action service (real) -->
+  <node unless="$(arg sim)" pkg="robot_io" type="suction_gripper_action_server" name="gripper_action_server" output="screen"/>
+  <param unless="$(arg sim)" name="suction_on_output_channel" value="2"/>
+  <param unless="$(arg sim)" name="suction_check_output_channel" value="1"/>
+  <param unless="$(arg sim)" name="use_sensor_feedback" value="true"/>
+  
+  <!-- rviz -->
+  <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" 
+	args="-d $(find pick_and_place_exercise)/config/ur5/rviz_config.rviz" output="screen">
+    <rosparam command="load" file="$(find ur5_environment_moveit_config)/config/kinematics.yaml"/>
+  </node>
+
+</launch>
