@@ -39,6 +39,8 @@ static std::string ARM_GROUP_NAME = "manipulator";
 static std::string TCP_LINK_NAME = "tcp_frame";
 static std::string WRIST_LINK_NAME = "ee_link";
 static std::string WORLD_FRAME_ID= "world_frame";
+static std::string HOME_POSE_NAME = "home";
+static std::string WAIT_POSE_NAME = "wait";
 static tf::Vector3 BOX_SIZE = tf::Vector3(0.1f,0.1f,0.1f);
 static tf::Transform BOX_PICK_TF = tf::Transform(tf::Quaternion::getIdentity(),tf::Vector3(-0.8f,0.2f,BOX_SIZE.getZ()/2.0f));
 static tf::Transform BOX_PLACE_TF = tf::Transform(tf::Quaternion::getIdentity(),tf::Vector3(-0.8f,-0.2f,BOX_SIZE.getZ()/2.0f));
@@ -56,6 +58,8 @@ bool read_ros_parameters()
 			&& nh.getParam("tcp_link_name",TCP_LINK_NAME)
 			&& nh.getParam("wrist_link_name",WRIST_LINK_NAME)
 			&& nh.getParam("world_frame_id",WORLD_FRAME_ID)
+			&& nh.getParam("home_pose_name",HOME_POSE_NAME)
+			&& nh.getParam("wait_pose_name",WAIT_POSE_NAME)
 			&& nh.getParam("box_width",w)
 			&& nh.getParam("box_length",l)
 			&& nh.getParam("box_height",h)
@@ -214,6 +218,36 @@ int main(int argc,char** argv)
 	else
 	{
 		ROS_ERROR_STREAM("Gripper failure");
+		ros::shutdown();
+		return 0;
+	}
+
+	/* =================================================
+	 * MOVING ARM TO HOME POSITION
+	   ================================================= */
+	move_group.setNamedTarget(HOME_POSE_NAME);
+	if(move_group.move())
+	{
+		ROS_INFO_STREAM("Move " << HOME_POSE_NAME<< " Succeeded");
+	}
+	else
+	{
+		ROS_INFO_STREAM("Move " << HOME_POSE_NAME<< " Failed");
+		ros::shutdown();
+		return 0;
+	}
+
+	/* =================================================
+	 * MOVING ARM TO WAIT POSITION
+	   ================================================= */
+	move_group.setNamedTarget(WAIT_POSE_NAME);
+	if(move_group.move())
+	{
+		ROS_INFO_STREAM("Move " << WAIT_POSE_NAME<< " Succeeded");
+	}
+	else
+	{
+		ROS_INFO_STREAM("Move " << WAIT_POSE_NAME<< " Failed");
 		ros::shutdown();
 		return 0;
 	}
