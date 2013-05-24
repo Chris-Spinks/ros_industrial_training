@@ -21,9 +21,20 @@
   <!--   - this typically includes: robot_state, motion_interface, and joint_trajectory_action nodes -->
   <!--   - replace these calls with appropriate robot-specific calls or launch files -->
   <group unless="$(arg sim)">
-    <include file="$(find ur5_environment_moveit_config)/launch/robot_interface.launch" >
-      <arg name="robot_ip" value="$(arg robot_ip)"/>
-    </include>
+	<remap from="/follow_joint_trajectory/status" to="/joint_trajectory_action/status" />
+<remap from="/follow_joint_trajectory/feedback" to="/joint_trajectory_action/feedback" />
+<remap from="/follow_joint_trajectory/result" to="/joint_trajectory_action/result" />
+<remap from="/follow_joint_trajectory/goal" to="/joint_trajectory_action/goal" />
+<remap from="/follow_joint_trajectory/cancel" to="/joint_trajectory_action/cancel" />
+	<node name="ur5_driver" pkg="ur5_driver" type="driver.py" args="$(arg robot_ip)" required="true" output="screen">
+		<!--param name="prefix" value=""/-->
+		<param name="prevent_programming" value="false"/>
+	</node>
+
+	<!-- TF Buffer Server -->
+	<node pkg="tf2_ros" type="buffer_server" name="tf2_buffer_server" output="screen">
+		<param name="buffer_size" value="120.0"/>
+	</node>
   </group>
 
   <!-- publish the robot state (tf transforms) -->
