@@ -1,5 +1,3 @@
-int64 a
-int64 b
+#request definition
 ---
-int64 sum
-int64 e
+#response definition
