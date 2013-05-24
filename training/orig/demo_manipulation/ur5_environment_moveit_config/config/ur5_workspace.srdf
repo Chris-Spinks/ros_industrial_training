@@ -26,11 +26,11 @@
         <joint name="wrist_2_joint" value="-1.5531" />
         <joint name="wrist_3_joint" value="0" />
     </group_state>
-    <group_state name="clear_sensor" group="manipulator">
-        <joint name="elbow_joint" value="0.6354" />
-        <joint name="shoulder_lift_joint" value="-0.8472" />
+    <group_state name="wait" group="manipulator">
+        <joint name="elbow_joint" value="1.1578" />
+        <joint name="shoulder_lift_joint" value="-0.953" />
         <joint name="shoulder_pan_joint" value="1.9061" />
-        <joint name="wrist_1_joint" value="-1.2001" />
+        <joint name="wrist_1_joint" value="-1.9116" />
         <joint name="wrist_2_joint" value="-1.7649" />
         <joint name="wrist_3_joint" value="0" />
     </group_state>
