@@ -5,7 +5,7 @@
 
   <!-- moveit components -->
   <include file="$(find ur5_environment_moveit_config)/launch/moveit_planning_execution.launch">
-	<arg name="sim" value="true"/>
+	<arg name="sim" value="$(arg sim)"/>
 	<arg unless="$(arg sim)" name="robot_ip" value="$(arg robot_ip)"/>
   </include>
 
