@@ -39,5 +39,8 @@
   <include file="$(find SIA20D_moveit_config)/launch/moveit_rviz.launch">
     <arg name="config" value="true" />
   </include>
+  
+  <include file="$(find SIA20D_moveit_config)/launch/default_warehouse_db.launch" />
+
 </launch>
 
