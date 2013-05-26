@@ -1,0 +1,14 @@
+<package>
+  <description brief="lesson_basic_launch">
+
+     lesson_basic_launch
+
+  </description>
+  <author>dsolomon</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/lesson_basic_launch</url>
+
+</package>
+
+
