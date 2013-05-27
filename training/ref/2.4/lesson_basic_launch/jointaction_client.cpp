@@ -48,7 +48,7 @@ int main (int argc, char **argv)
 
   // create the action client
   actionlib::ActionClient<control_msgs::FollowJointTrajectoryAction> ac(nh, "joint_trajectory_action");
-  ros::Rate(1.).sleep();    //wait for 1 sec to connect, rather than spin a thread to check connection
+  ros::Rate(1.).sleep();    //wait for 5 sec to connect, rather than spin a thread to check connection
 
   ROS_INFO("Sending goal to action server.");
   // send trajectory to the action server
