@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
     // Loop through until the ROS system tells the user to shut down
     while(ros::ok()) {
         // Print out a message
-        std::cout << "We've gone through " << count << " times." << std::endl;
+        ROS_INFO("We've gone through %d times.", count);
         ++count;
         // Wait the stated duration
         loop_rate.sleep();
