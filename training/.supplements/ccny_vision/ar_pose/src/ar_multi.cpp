@@ -23,12 +23,22 @@
 #include "ar_pose/ar_multi.h"
 #include "ar_pose/object.h"
 
+std::string OBJECT_NAME = "ar_tag";
+
 int main (int argc, char **argv)
 {
   ros::init (argc, argv, "ar_single");
   ros::NodeHandle n;
   ar_pose::ARSinglePublisher ar_single (n);
-  ros::spin ();
+
+  ros::Duration loop_time(0.1f);
+  while(ros::ok()&& loop_time.sleep())
+  {
+	ros::spinOnce();
+  }
+
+//  ros::spin();
+
   return 0;
 }
 
@@ -146,6 +156,7 @@ namespace ar_pose
 
   void ARSinglePublisher::getTransformationCallback (const sensor_msgs::ImageConstPtr & image_msg)
   {
+
     ARUint8 *dataPtr;
     ARMarkerInfo *marker_info;
     int marker_num;
@@ -160,7 +171,7 @@ namespace ar_pose
     {
       //capture_ = cv_bridge_.imgMsgToCv (image_msg, "bgr8");
       mat_ptr = cv_bridge::toCvCopy(image_msg,sensor_msgs::image_encodings::BGR8);
-      if(capture_ != NULL) delete capture_;
+      //if(capture_ != NULL) delete capture_;
       capture_ = new IplImage(mat_ptr->image);
     }
     catch (cv_bridge::Exception & e)
@@ -313,7 +324,8 @@ namespace ar_pose
 
       if (publishTf_)
       {
-			tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, object[i].name);
+			//tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, object[i].name);
+			tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, OBJECT_NAME);
 			broadcaster_.sendTransform(camToMarker);
       }
 
