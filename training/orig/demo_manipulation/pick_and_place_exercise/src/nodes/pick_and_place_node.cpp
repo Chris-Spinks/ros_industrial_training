@@ -41,6 +41,7 @@ static std::string WRIST_LINK_NAME = "ee_link";
 static std::string WORLD_FRAME_ID= "world_frame";
 static std::string HOME_POSE_NAME = "home";
 static std::string WAIT_POSE_NAME = "wait";
+static std::string TAG_FRAME_ID = "ar_tag";
 static tf::Vector3 BOX_SIZE = tf::Vector3(0.1f,0.1f,0.1f);
 static tf::Transform BOX_PICK_TF = tf::Transform(tf::Quaternion::getIdentity(),tf::Vector3(-0.8f,0.2f,BOX_SIZE.getZ()/2.0f));
 static tf::Transform BOX_PLACE_TF = tf::Transform(tf::Quaternion::getIdentity(),tf::Vector3(-0.8f,-0.2f,BOX_SIZE.getZ()/2.0f));
@@ -52,7 +53,7 @@ using namespace tf;
 bool read_ros_parameters()
 {
 	ros::NodeHandle nh("~");
-	double w, l, h, x, y;
+	double w, l, h, x, y, z;
 
 	if(nh.getParam("arm_group_name",ARM_GROUP_NAME)
 			&& nh.getParam("tcp_link_name",TCP_LINK_NAME)
@@ -60,16 +61,18 @@ bool read_ros_parameters()
 			&& nh.getParam("world_frame_id",WORLD_FRAME_ID)
 			&& nh.getParam("home_pose_name",HOME_POSE_NAME)
 			&& nh.getParam("wait_pose_name",WAIT_POSE_NAME)
+			&& nh.getParam("tag_frame_id",TAG_FRAME_ID)
 			&& nh.getParam("box_width",w)
 			&& nh.getParam("box_length",l)
 			&& nh.getParam("box_height",h)
 			&& nh.getParam("box_place_x",x)
 			&& nh.getParam("box_place_y",y)
+			&& nh.getParam("box_place_z",z)
 			&& nh.getParam("retreat_distance",RETREAT_DISTANCE)
 			&& nh.getParam("approach_distance",APPROACH_DISTANCE))
 	{
 		BOX_SIZE = Vector3(l,w,h);
-		BOX_PLACE_TF.setOrigin(Vector3(x,y,h/2.0f));
+		BOX_PLACE_TF.setOrigin(Vector3(x,y,z));
 		return true;
 	}
 	else
@@ -130,8 +133,6 @@ int main(int argc,char** argv)
 	actionlib::SimpleActionClient<object_manipulation_msgs::GraspHandPostureExecutionAction> grasp_action_client(GRASP_ACTION_SERVICE,true);
 	object_manipulation_msgs::GraspHandPostureExecutionGoal grasp_goal;
 
-	// recognition service
-	geometry_msgs::Pose box_pose;
 
 	// waiting to establish connections
 	while(ros::ok() &&
@@ -139,6 +140,14 @@ int main(int argc,char** argv)
 	{
 		ROS_INFO_STREAM("Waiting for servers");
 	}
+
+	/* =================================================
+	 * DETECTING BOX PICK POSE
+	   ================================================= */
+	geometry_msgs::Pose box_pose;
+	tf::StampedTransform world_to_box_pick_tf;
+	tf_listener.lookupTransform(WORLD_FRAME_ID,TAG_FRAME_ID,ros::Time(0.0f),world_to_box_pick_tf);
+	tf::poseTFToMsg(world_to_box_pick_tf,box_pose);
 
 	/* =================================================
 	 * PICK MOVE SETUP
@@ -153,11 +162,8 @@ int main(int argc,char** argv)
 	// finding transform from wrist to tcp
 	tf_listener.lookupTransform(TCP_LINK_NAME,WRIST_LINK_NAME,ros::Time(0.0f),tcp_to_wrist_tf);
 
-	// setting box pose at pick
-	tf::poseTFToMsg(BOX_PICK_TF,box_pose);
-
 	// resolving wrist pose relative to world frame at pick
-	world_to_tcp_tf.setOrigin(tf::Vector3(box_pose.position.x,box_pose.position.y,BOX_SIZE.getZ()));
+	world_to_tcp_tf.setOrigin(tf::Vector3(box_pose.position.x,box_pose.position.y,BOX_SIZE.getZ()/2.0f));
 	world_to_tcp_tf.setRotation(tf::Quaternion(M_PI,0,M_PI_2));
 	world_to_wrist_tf = world_to_tcp_tf * tcp_to_wrist_tf;
 
@@ -189,7 +195,7 @@ int main(int argc,char** argv)
 	tf::poseTFToMsg(BOX_PLACE_TF,box_pose);
 
 	// resolving wrist pose in world at place
-	world_to_tcp_tf.setOrigin(tf::Vector3(box_pose.position.x,box_pose.position.y,BOX_SIZE.getZ()));
+	world_to_tcp_tf.setOrigin(tf::Vector3(box_pose.position.x,box_pose.position.y,box_pose.position.z));
 	world_to_tcp_tf.setRotation(tf::Quaternion(M_PI,0,M_PI_2));
 	world_to_wrist_tf = world_to_tcp_tf * tcp_to_wrist_tf;
 
@@ -218,21 +224,6 @@ int main(int argc,char** argv)
 	else
 	{
 		ROS_ERROR_STREAM("Gripper failure");
-		ros::shutdown();
-		return 0;
-	}
-
-	/* =================================================
-	 * MOVING ARM TO HOME POSITION
-	   ================================================= */
-	move_group.setNamedTarget(HOME_POSE_NAME);
-	if(move_group.move())
-	{
-		ROS_INFO_STREAM("Move " << HOME_POSE_NAME<< " Succeeded");
-	}
-	else
-	{
-		ROS_INFO_STREAM("Move " << HOME_POSE_NAME<< " Failed");
 		ros::shutdown();
 		return 0;
 	}
@@ -328,6 +319,21 @@ int main(int argc,char** argv)
 				return 0;
 			}
 		}
+	}
+
+	/* =================================================
+	 * MOVING ARM TO WAIT POSITION
+	   ================================================= */
+	move_group.setNamedTarget(WAIT_POSE_NAME);
+	if(move_group.move())
+	{
+		ROS_INFO_STREAM("Move " << HOME_POSE_NAME<< " Succeeded");
+	}
+	else
+	{
+		ROS_INFO_STREAM("Move " << HOME_POSE_NAME<< " Failed");
+		ros::shutdown();
+		return 0;
 	}
 
 	return 0;
