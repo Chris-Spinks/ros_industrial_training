@@ -34,7 +34,7 @@
 
 // Simple message
 #include "simple_message/simple_message.h"
-#include "simple_message/socket/tcp_client.h"
+#include "simple_message/socket/tcp_server.h"
 #include "simple_message/messages/joint_message.h"
 
 // ROS core (not really required for simple message, but allows us to use roslaunch)
@@ -42,51 +42,84 @@
 
 // Using declarations to simplify code (BAD FORM, DON'T DO THIS)
 using namespace industrial::joint_message;
-using namespace industrial::tcp_client;
+using namespace industrial::tcp_server;
 using namespace industrial::simple_message;
 
 int main(int argc, char** argv)
 {
+
+
   // Initialize ROS node "sm_talker"
-  ros::init(argc, argv, "sm_talker");
+  ros::init(argc, argv, "sm_listener");
 
   // Required to start timers for non-node ROS use.
   ros::Time::init();
 
   // Little message to know she's started
-  ROS_INFO_STREAM("STARTING SM_TALKER");
+  ROS_INFO_STREAM("STARTING SM_LISTENER");
 
-  // Create a TCP client connection to TCP_PORT on LOCAL_HOST (see common.h)
-  TcpClient client;
-  client.init(LOCAL_HOST, TCP_PORT);
+  // Create a TCP server connection on TCP_PORT (see common.h)
+  TcpServer server;
+  server.init(TCP_PORT);
 
-  // While client is not connected (while loop):
+  // While server is not connected (while loop):
   // * Print out a helpful info message
   // * Try to connect
   // * Sleep for half a second (use ROS library call: ros::Duration(0.5).sleep())
-    
-  // INSERT CODE HERE
+  while(!server.isConnected())
+  {
+    ROS_INFO_STREAM("Trying to connect to client");
+    server.makeConnect();
+    ros::Duration(0.5).sleep();
+  }
 
-
-
-
-
-
-  // While client is connected (while loop):
-  // * increment sequence number of joint message
-  // * Create a joint message (JointMessage)
-  // * Create a simple message (SimpleMessage) request from joint message
-  // * Print an INFO message with sequence number
-  // * send message to server and wait for reply
+  // While server is connected (while loop):
+  // * Print an INFO message indicating server is waiting
+  // * Receive message
+  // * Check type matches JointMessage
+  // * Check type for CommType::SERVICE_REQUEST
+  // * Create a joint message (JointMessage) from the received simple message
+  // * Print an INFO message with the sequence number
+  // * Create a reply joint message (JointMessage)
+  // * Convert reply to simple message (SimpleMessage)
+  // * Send reply with ReplyType::SUCCESS
   // * Print an INFO message with the reply code
-  // * Sleep for 1.0 seconds: ros::Duration(1.0).sleep();
-  
-  // INSERT CODE HERE
+  while(server.isConnected())
+  {
+
+    // Create a message of type JointMessage
+    JointMessage jmReq, jmReply;
+    SimpleMessage req, reply;
+
+    ROS_INFO_STREAM("Waiting for client request");
+
+    server.receiveMsg(req);
+
+    if( req.getMessageType() == jmReq.getMessageType() )
+    {
+      if( req.getCommType() == CommTypes::SERVICE_REQUEST )
+      {
+        jmReq.init(req);
+        ROS_INFO_STREAM("Received sequence number: " << jmReq.getSequence());
+
+        jmReply.toReply(reply, ReplyTypes::SUCCESS);
+        server.sendMsg(reply);
+
+        ROS_INFO_STREAM("Sending reply code: " << reply.getReplyCode());
+      }
+      else
+      {
+        ROS_ERROR_STREAM("Unexpected comm type: " << req.getCommType());
+      }
+    }
+    else
+    {
+      ROS_ERROR_STREAM("Unexpected message type: " << req.getMessageType());
+    }
 
 
-
-
-
+  }
 
   return 0;
 }
+

@@ -64,13 +64,14 @@ int main(int argc, char** argv)
   // * Print out a helpful info message
   // * Try to connect
   // * Sleep for half a second (use ROS library call: ros::Duration(0.5).sleep())
-    
-  // INSERT CODE HERE
+  while(!client.isConnected())
+  {
+    ROS_INFO_STREAM("Trying to connect to server");
+    client.makeConnect();
+    ros::Duration(0.5).sleep();
+  }
 
-
-
-
-
+  int seq = 0;
 
   // While client is connected (while loop):
   // * increment sequence number of joint message
@@ -80,13 +81,28 @@ int main(int argc, char** argv)
   // * send message to server and wait for reply
   // * Print an INFO message with the reply code
   // * Sleep for 1.0 seconds: ros::Duration(1.0).sleep();
-  
-  // INSERT CODE HERE
+
+  while(client.isConnected())
+  {
+    // Create a message of type JointMessage and corresponding simple message
+    JointMessage jmReq;
+    SimpleMessage req, reply;
 
 
+    seq++;
+    jmReq.setSequence(seq);
 
+    jmReq.toRequest(req);
 
+    ROS_INFO_STREAM("Sending sequence number: " << seq);
 
+    client.sendAndReceiveMsg(req, reply);
+
+    ROS_INFO_STREAM("Received reply code: " << reply.getReplyCode());
+
+    ros::Duration(1.0).sleep();
+
+  }
 
   return 0;
 }

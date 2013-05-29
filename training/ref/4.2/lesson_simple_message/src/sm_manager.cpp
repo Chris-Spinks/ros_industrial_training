@@ -130,23 +130,19 @@ int main(int argc, char** argv)
   // * Initialize handler using server connection
   // * Add handler to manager
   // * Execute manager spin loop
-    
-  // INSERT CODE HERE
+  TcpServer server;
+  server.init(TCP_PORT);
 
+  MessageManager manager;
+  MyHandler handler;
 
-
-
-
+  manager.init(&server);
 
   // Handler initilaized with reply connection (typically the same as
   // incoming connection but now always)
-    
-  // INSERT CODE HERE
-
-
-
-
-
+  handler.init(&server);
+  manager.add(&handler);
+  manager.spin();
 
   return 0;
 }
