@@ -45,6 +45,7 @@ local TRAINING_PACKAGE_PATH=$UNIT_DIR:$TRAINING_DIR/supplements
 echo "ROS_PACKAGE_PATH=$TRAINING_PACKAGE_PATH:\$ROS_PACKAGE_PATH" > $TRAINING_FILE
 echo "echo -e \"\n\e[00;32m  Switching to UNIT $UNIT ($SUBDIR copy)\e[00m\n\"" >> $TRAINING_FILE
 echo "PS1=\"\[\e]0;ROS-I Training Unit $UNIT ($SUBDIR)\a\]\u@\h:\w\$ \"" >> $TRAINING_FILE
+echo "export LIBGL_ALWAYS_SOFTWARE=1" >> $TRAINING_FILE
 
 source $TRAINING_FILE
 cd $UNIT_DIR
