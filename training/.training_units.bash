@@ -49,7 +49,7 @@ echo "PS1=\"\[\e]0;ROS-I Training Unit $UNIT ($SUBDIR)\a\]\u@\h:\w\$ \"" >> $TRA
 source $TRAINING_FILE
 cd $UNIT_DIR
 
-}
+}   #end set_training_unit()
 
 function training_unit {
 if [ $# -ne 1 ]; then
@@ -57,7 +57,7 @@ if [ $# -ne 1 ]; then
 else
   set_training_unit $1 work
 fi
-}
+}   #end training_unit()
 
 function training_ref {
 if [ $# -ne 1 ]; then
@@ -65,5 +65,12 @@ if [ $# -ne 1 ]; then
 else
   set_training_unit $1 ref
 fi
-}
+}   #end training_ref()
 
+function training_orig {
+if [ $# -ne 1 ]; then
+  echo "Usage: $FUNCNAME UNIT"
+else
+  set_training_unit $1 orig
+fi
+}   #end training_orig()
