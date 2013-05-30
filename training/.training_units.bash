@@ -13,7 +13,7 @@ then
 fi
 
 # get training directory from this file's path
-local TRAINING_DIR=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
+local TRAINING_DIR=$(dirname "$BASH_SOURCE")
 
 # assume function arg is unit ID (e.g. 1.2)
 local UNIT=$1    # arg 1 is unitID (e.g. 1.2)
@@ -27,7 +27,7 @@ if [ ! -d $UNIT_DIR ]; then
 fi
 
 source ~/.bashrc  # reset ROS_PACKAGE_PATH
-export ROS_PACKAGE_PATH=$UNIT_DIR:$TRAINING_DIR/.supplements:$ROS_PACKAGE_PATH
+export ROS_PACKAGE_PATH=$UNIT_DIR:$TRAINING_DIR/supplements:$ROS_PACKAGE_PATH
 set_title "ROS-I Training Unit $UNIT ($SUBDIR)"
 cd $UNIT_DIR
 echo -e "\n\e[00;32m  Switching to UNIT $UNIT ($SUBDIR copy)\e[00m\n"
