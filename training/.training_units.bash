@@ -13,6 +13,11 @@ if [ -f $TRAINING_FILE ]; then
 fi
 #=======================================================================
 
+function clear_training_unit {
+  rm -f $TRAINING_FILE
+  source ~/.bashrc
+}
+
 function set_training_unit {
 
 if [ $# -ne 2 ]
@@ -33,8 +38,7 @@ if [ ! -d $UNIT_DIR ]; then
 fi
 
 # create new package path (with training_unit and supplements)
-rm -f $TRAINING_FILE  # remove old file, to get a "clean" path
-source ~/.bashrc  # reset ROS_PACKAGE_PATH
+clear_training_unit # reset ROS_PACKAGE_PATH
 local TRAINING_PACKAGE_PATH=$UNIT_DIR:$TRAINING_DIR/supplements
 
 # save path (and other code) to file for re-use in new terminals
