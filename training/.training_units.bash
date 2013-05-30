@@ -1,8 +1,17 @@
 #!/bin/bash
 
-function set_title {
-echo -en "\033]2;$1\007"
-}
+#=======================================================================
+# run this code every time the file is sourced (e.g. for each new shell)
+
+# get training directory from this file's path
+TRAINING_DIR=$(dirname "$BASH_SOURCE")
+
+# try to set ROS_PACKAGE_PATH for current training unit
+TRAINING_FILE=$TRAINING_DIR/.training_unit
+if [ -f $TRAINING_FILE ]; then
+    . $TRAINING_FILE
+fi
+#=======================================================================
 
 function set_training_unit {
 
@@ -11,9 +20,6 @@ then
   echo "Usage: $FUNCNAME UNIT SUBDIR"
   return $E_BADARGS
 fi
-
-# get training directory from this file's path
-local TRAINING_DIR=$(dirname "$BASH_SOURCE")
 
 # assume function arg is unit ID (e.g. 1.2)
 local UNIT=$1    # arg 1 is unitID (e.g. 1.2)
@@ -26,11 +32,18 @@ if [ ! -d $UNIT_DIR ]; then
   return
 fi
 
+# create new package path (with training_unit and supplements)
+rm -f $TRAINING_FILE  # remove old file, to get a "clean" path
 source ~/.bashrc  # reset ROS_PACKAGE_PATH
-export ROS_PACKAGE_PATH=$UNIT_DIR:$TRAINING_DIR/supplements:$ROS_PACKAGE_PATH
-set_title "ROS-I Training Unit $UNIT ($SUBDIR)"
+local TRAINING_PACKAGE_PATH=$UNIT_DIR:$TRAINING_DIR/supplements
+
+# save path (and other code) to file for re-use in new terminals
+echo "ROS_PACKAGE_PATH=$TRAINING_PACKAGE_PATH:\$ROS_PACKAGE_PATH" > $TRAINING_FILE
+echo "echo -e \"\n\e[00;32m  Switching to UNIT $UNIT ($SUBDIR copy)\e[00m\n\"" >> $TRAINING_FILE
+echo "PS1=\"\[\e]0;ROS-I Training Unit $UNIT ($SUBDIR)\a\]\u@\h:\w\$ \"" >> $TRAINING_FILE
+
+source $TRAINING_FILE
 cd $UNIT_DIR
-echo -e "\n\e[00;32m  Switching to UNIT $UNIT ($SUBDIR copy)\e[00m\n"
 
 }
 
@@ -49,3 +62,4 @@ else
   set_training_unit $1 ref
 fi
 }
+
