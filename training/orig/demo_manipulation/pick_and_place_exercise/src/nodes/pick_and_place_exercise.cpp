@@ -6,10 +6,7 @@
  *      Author: ros developer 
  */
 
-
-#include <string.h>
-
-// ros headers
+// =============================== ros headers ===============================
 #include <ros/ros.h>
 #include <actionlib/client/simple_action_client.h>
 #include <geometry_msgs/Transform.h>
@@ -18,7 +15,9 @@
 #include <tf/transform_listener.h>
 #include <tf/tf.h>
 
-// moveit headers
+
+
+// =============================== moveit headers ===============================
 #include <moveit/move_group_interface/move_group.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit/robot_state/robot_state.h>
@@ -28,13 +27,31 @@
 #include <moveit_msgs/GetStateValidity.h>
 #include <moveit_msgs/DisplayRobotState.h>
 
-// object manipulation headers
+
+
+// =============================== object manipulation headers ===============================
 #include <object_manipulation_msgs/GraspHandPostureExecutionAction.h>
 
-// global variables
+
+
+// =============================== aliases ===============================
+typedef actionlib::SimpleActionClient<object_manipulation_msgs::GraspHandPostureExecutionAction> GraspActionClient;
+
+
+
+// =============================== program constants ===============================
 static const std::string GRASP_ACTION_SERVICE = "grasp_execution_action";
 
-// ros parameters
+
+
+// =============================== global variables =====================================
+geometry_msgs::Pose box_pose;
+std::vector<geometry_msgs::Pose> tcp_pick_poses, wrist_pick_poses;
+std::vector<geometry_msgs::Pose> tcp_place_poses,wrist_place_poses;
+
+
+
+// =============================== ros parameters ===============================
 static std::string ARM_GROUP_NAME = "manipulator";
 static std::string TCP_LINK_NAME = "tcp_frame";
 static std::string WRIST_LINK_NAME = "ee_link";
@@ -49,6 +66,8 @@ static double RETREAT_DISTANCE = 0.05f;
 static double APPROACH_DISTANCE = 0.05f;
 
 using namespace tf;
+
+// =============================== Utility functions ===============================
 
 bool read_ros_parameters()
 {
@@ -124,58 +143,11 @@ std::vector<geometry_msgs::Pose> transform_from_tcp_to_wrist(tf::Transform tcp_t
 	return wrist_poses;
 }
 
-int main(int argc,char** argv)
+// =============================== Tasks Modules ===============================
+
+void task_move_to_wait_position(move_group_interface::MoveGroup& move_group)
 {
-
-	/* =================== TASK =====================
-		INITIALIZE ROS NODE
-		Goal:
-			- Observe all steps needed to properly initialize a ros node.
-			- Look into the 'read_ros_parameters' function to take notice of the parameters that
-				are available for the rest of the program.
-		Hints:
-		-
-	Complete code below: */
-
-	// ros initialization
-	ros::init(argc,argv,"pick_and_place_node");
-	ros::NodeHandle nh;
-	tf::TransformListener tf_listener; // queries tf to find transforms
-	ros::AsyncSpinner spinner(2);
-	spinner.start();
-
-	// reading parameters
-	if(read_ros_parameters())
-	{
-		ROS_INFO_STREAM("Parameters successfully read");
-	}
-	else
-	{
-		ROS_ERROR_STREAM("Parameters not found");
-		return 0;
-	}
-
-	// moveit interface initialization
-	move_group_interface::MoveGroup move_group(ARM_GROUP_NAME);
-
-	// grasp action client initialization
-	actionlib::SimpleActionClient<object_manipulation_msgs::GraspHandPostureExecutionAction> grasp_action_client(GRASP_ACTION_SERVICE,true);
-
-	// waiting to establish connections
-	while(ros::ok() &&
-			( !grasp_action_client.waitForServer(ros::Duration(2.0f))))
-	{
-		ROS_INFO_STREAM("Waiting for servers");
-	}
-
-	/* =============== END OF TASK =================== */
-
-
-
-
-
-	/* =================== TASK =====================
-		MOVING ARM TO WAIT POSITION
+	/*	MOVING ARM TO WAIT POSITION
 		Goal:
 			- Use the 'move_group' interface to move the robot to the 'wait' target.
 			- Observe how we verify that the move was completed
@@ -201,16 +173,13 @@ int main(int argc,char** argv)
 	{
 		ROS_INFO_STREAM("Move " << WAIT_POSE_NAME<< " Failed");
 		ros::shutdown();
-		return 0;
+		return;
 	}
-	/* =============== END OF TASK =================== */
+}
 
-
-
-
-
-	/* =================== TASK =====================
-		OPEN GRIPPER
+void task_open_gripper(GraspActionClient& grasp_action_client)
+{
+	/*	OPEN GRIPPER
 		Goal:
 			- Use the grasp action client to open the gripper.
 			- Confirm that the gripper was successfully opened.  Exit program on failure;
@@ -220,6 +189,7 @@ int main(int argc,char** argv)
 
 	// task variables
 	object_manipulation_msgs::GraspHandPostureExecutionGoal grasp_goal;
+	bool success;
 
 	// send grasp goal to open gripper
 	grasp_goal.goal = object_manipulation_msgs::GraspHandPostureExecutionGoal::RELEASE;
@@ -238,15 +208,11 @@ int main(int argc,char** argv)
 
 		/* Fill Code: [ call the ros shutdown function and then return] */
 	}
+}
 
-	/* =============== END OF TASK =================== */
-
-
-
-
-
-	/* =================== TASK =====================
-		DETECTING BOX PICK POSE
+void task_detect_box_pick(tf::TransformListener &tf_listener)
+{
+	/*	DETECTING BOX PICK POSE
 		Goal:
 			- Find the box's pick pose in the world frame using the transform listener.
 			- Save the pose into 'box_pose'.
@@ -257,7 +223,6 @@ int main(int argc,char** argv)
 	Complete code below: */
 
 	// task variables
-	geometry_msgs::Pose box_pose;
 	tf::StampedTransform world_to_box_pick_tf;
 
 	// use transform listener to find the box's pick pose
@@ -265,16 +230,11 @@ int main(int argc,char** argv)
 
 	// save pose in 'box_pose'
 	/* Fill Code: [ use the 'tf::poseTFToMsg' to save a transform into a pose ] */
+}
 
-	/* =============== END OF TASK =================== */
-
-
-
-
-
-
-	/* =================== TASK =====================
-		CREATE PICK MOVES
+void task_create_pick_moves(tf::TransformListener &tf_listener)
+{
+	/*	CREATE PICK MOVES
 		Goal:
 			- Set the pose for the tcp at the box pick.
 			- Create a tcp poses to be used in between pick moves (Approach, target, retreat).
@@ -289,7 +249,6 @@ int main(int argc,char** argv)
 
 	// task variables
 	tf::Transform world_to_tcp_tf;
-	std::vector<geometry_msgs::Pose> tcp_pick_poses, wrist_pick_poses;
 	tf::StampedTransform tcp_to_wrist_tf;
 
 	// create tcp pose at box pick
@@ -300,7 +259,7 @@ int main(int argc,char** argv)
 	tcp_pick_poses = create_manipulation_poses(RETREAT_DISTANCE,APPROACH_DISTANCE,world_to_tcp_tf);
 
 	// finding transform from tcp to wrist
-	/* Fill Code: [ use the 'lookupTransform' method in the transform listener] */
+	tf_listener.lookupTransform(TCP_LINK_NAME,WAIT_POSE_NAME,ros::Time(0.0f),tcp_to_wrist_tf);
 
 	// transforming tcp poses to wrist
 	/* Fill Code: [ use the 'transform_from_tcp_to_wrist' function and save results into 'wrist_pick_poses'] */
@@ -319,14 +278,11 @@ int main(int argc,char** argv)
 	ROS_INFO_STREAM("wrist position at pick: ["<<pick_pose.position.x<<", "
 			<<pick_pose.position.y <<", "
 			<<pick_pose.position.z <<"]");
+}
 
-	/* =============== END OF TASK =================== */
-
-
-
-
-	/* =================== TASK =====================
-		MOVE ARM THROUGH PICK POSES
+void task_move_through_pick_poses(move_group_interface::MoveGroup& move_group,GraspActionClient& grasp_action_client)
+{
+	/*	MOVE ARM THROUGH PICK POSES
 		Goal:
 			- Use the 'move_group' object to set the wrist as the end-effector link
 			- Use the 'move_group' object to set the world frame as the reference frame for path planning
@@ -339,6 +295,10 @@ int main(int argc,char** argv)
 			- The 'setPoseTarget' method allows you to set a "pose" as your target to move the robot.
 
 	Complete code below: */
+
+	// task variables
+	object_manipulation_msgs::GraspHandPostureExecutionGoal grasp_goal;
+	bool success;
 
 	// set the wrist as the end-effector link
 	/* Fill Code: [ use the 'setEndEffectorLink' in the 'move_group' object] */
@@ -364,7 +324,7 @@ int main(int argc,char** argv)
 		{
 			ROS_INFO_STREAM("Pick Move " << i <<" Failed");
 			ros::shutdown();
-			return 0;
+			return;
 		}
 
 		// turn on gripper suction after approach pose
@@ -387,19 +347,16 @@ int main(int argc,char** argv)
 			{
 				ROS_ERROR_STREAM("Gripper failure");
 				ros::shutdown();
-				return 0;
+				return;
 			}
 		}
 
 	}
-	/* =============== END OF TASK =================== */
+}
 
-
-
-
-
-	/* =================== TASK =====================
-		CREATE PLACE MOVES
+void task_create_place_moves(tf::TransformListener& tf_listener)
+{
+	/*	CREATE PLACE MOVES
 		Goal:
 			- Save box place pose in 'box_pose'
 			- Set the pose of the tcp at the box place
@@ -413,19 +370,24 @@ int main(int argc,char** argv)
 	Complete code below: */
 
 	// task variables
-	std::vector<geometry_msgs::Pose> tcp_place_poses,wrist_place_poses;
+	tf::Transform world_to_tcp_tf;
+	tf::StampedTransform tcp_to_wrist_tf;
 
 	// setting 'box_pose' at place
 	tf::poseTFToMsg(BOX_PLACE_TF,box_pose);
+
 
 	// finding tcp pose at box place
 	/* Fill Code: [ use the 'setOrigin' to set the position of 'world_to_tcp_tf'] */
 	/* Fill Code: [ use the 'setRotation' to set the orientation of 'world_to_tcp_tf'] */
 
 
-
 	// creating place poses for tcp
 	/* Fill Code: [ use the 'create_manipulation_poses' and save results to 'tcp_place_poses'] */
+
+
+	// finding transform from tcp to wrist
+	/* Fill Code: [ use the 'lookupTransform' method in the transform listener] */
 
 	// transforming tcp poses to wrist
 	wrist_place_poses = transform_from_tcp_to_wrist(tcp_to_wrist_tf,tcp_place_poses);
@@ -439,22 +401,21 @@ int main(int argc,char** argv)
 	ROS_INFO_STREAM("wrist position at place: ["<<place_pose.position.x<<", "
 			<<place_pose.position.y <<", "
 			<<place_pose.position.z <<"]");
+}
 
-	/* =============== END OF TASK =================== */
-
-
-
-
-
-
-	/* =================== TASK =====================
-		MOVE ARM THROUGH PLACE POSES
+void task_move_through_place_poses(move_group_interface::MoveGroup& move_group,GraspActionClient& grasp_action_client)
+{
+	/*	MOVE ARM THROUGH PLACE POSES
 		Goal:
 			- Move the robot to each place pose.
 			- Open gripper after reaching the target pose
 		Hints:
 			- Use the methods seen so far such as 'move', 'sendGoal', 'waitForResult' as needed
 	Complete code below: */
+
+	// task variables
+	object_manipulation_msgs::GraspHandPostureExecutionGoal grasp_goal;
+	bool success;
 
 	// setting end-effector link and reference frame
 	move_group.setEndEffectorLink(WRIST_LINK_NAME);
@@ -477,7 +438,7 @@ int main(int argc,char** argv)
 		{
 			ROS_INFO_STREAM("Place Move " << i <<" Failed");
 			ros::shutdown();
-			return 0;
+			return;
 		}
 
 		// turn off gripper suction (RELEASE) after reaching target pose
@@ -499,30 +460,94 @@ int main(int argc,char** argv)
 			{
 				ROS_ERROR_STREAM("Gripper failure");
 				ros::shutdown();
-				return 0;
+				return;
 			}
 		}
 	}
-
-	/* =============== END OF TASK =================== */
-
+}
 
 
+// =============================== Main Thread ===============================
 
+int main(int argc,char** argv)
+{
 
-	/* =================== TASK =====================
-		MOVING ARM TO WAIT POSITION
+	/* =========================================================================================*/
+	/*	INITIALIZING ROS NODE
 		Goal:
-			- Finish program by moving the arm the the wait position and verify completion.
+			- Observe all steps needed to properly initialize a ros node.
+			- Look into the 'read_ros_parameters' function to take notice of the parameters that
+				are available for the rest of the program. */
+	/* =========================================================================================*/
 
-		Hints:
-		-
-	Complete code below: */
+	// ros initialization
+	ros::init(argc,argv,"pick_and_place_node");
+	ros::NodeHandle nh;
+	tf::TransformListener tf_listener; // queries tf to find transforms
+	ros::AsyncSpinner spinner(2);
+	spinner.start();
 
-	/* Fill Code: [ use all needed methods to move the robot to the wait position] */
+	// reading parameters
+	if(read_ros_parameters())
+	{
+		ROS_INFO_STREAM("Parameters successfully read");
+	}
+	else
+	{
+		ROS_ERROR_STREAM("Parameters not found");
+		return 0;
+	}
+
+	// moveit interface initialization
+	move_group_interface::MoveGroup move_group(ARM_GROUP_NAME);
+
+	// grasp action client initialization
+	GraspActionClient grasp_action_client(GRASP_ACTION_SERVICE,true);
+
+	// waiting to establish connections
+	while(ros::ok() &&
+			 !grasp_action_client.waitForServer(ros::Duration(2.0f)))
+	{
+		ROS_INFO_STREAM("Waiting for servers");
+	}
 
 
-	/* =============== END OF TASK =================== */
+	/* =================== TASK 1 =====================*/
+	task_move_to_wait_position(move_group);
+
+
+
+	/* =================== TASK 2 =====================*/
+	task_open_gripper(grasp_action_client);
+
+
+
+	/* =================== TASK 3 ===================== */
+	task_detect_box_pick(tf_listener);
+
+
+
+	/* =================== TASK 4 =====================*/
+	task_create_pick_moves(tf_listener);
+
+
+
+	/* =================== TASK 5 ===================== */
+	task_move_through_pick_poses(move_group,grasp_action_client);
+
+
+
+	/* =================== TASK 6 =====================*/
+	task_create_place_moves(tf_listener);
+
+
+
+	/* =================== TASK 7 =====================*/
+	task_move_through_place_poses(move_group,grasp_action_client);
+
+
+	/* =================== TASK 9 =====================*/
+	task_move_to_wait_position(move_group);
 
 	return 0;
 }
