@@ -26,12 +26,12 @@
   <link name="grinder" >
     <visual>
       <geometry>
-        <mesh filename="package://lesson_advanced_launch/models/grinder_visual.dae" />
+        <mesh filename="package://lesson_tf_terminal/models/grinder_visual.dae" />
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://lesson_advanced_launch/models/grinder_collision.dae" />
+        <mesh filename="package://lesson_tf_terminal/models/grinder_collision.dae" />
       </geometry>
     </collision>
   </link>

@@ -17,12 +17,12 @@
   <link name="part" >
     <visual>
       <geometry>
-        <mesh filename="package://lesson_advanced_launch/models/${model_name}" />
+        <mesh filename="package://lesson_tf_cpp/models/${model_name}" />
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://lesson_advanced_launch/models/${model_name}" />
+        <mesh filename="package://lesson_tf_cpp/models/${model_name}" />
       </geometry>
     </collision>
   </link>
