@@ -178,7 +178,7 @@ int main(int argc,char** argv)
 		MOVING ARM TO WAIT POSITION
 		Goal:
 			- Use the 'move_group' interface to move the robot to the 'wait' target.
-			- Verify that the move was completed. Exit on failure
+			- Observe how we verify that the move was completed
 
 		Hints:
 			- The 'WAIT_POSE_NAME' contains the name of the wait target.
@@ -188,9 +188,11 @@ int main(int argc,char** argv)
 	// task variables
 	bool success; // saves the move result
 
+	// set robot wait target
+	/* Fill Code: [ use the 'setNamedTarget' method in the 'move_group' object] */
 
-	move_group.setNamedTarget(WAIT_POSE_NAME);
-	success = move_group.move();
+	// move the robot
+	/* Fill Code: [ use the 'move' method in the 'move_group' object and save the result in the 'success' variable] */
 	if(success)
 	{
 		ROS_INFO_STREAM("Move " << WAIT_POSE_NAME<< " Succeeded");
@@ -221,10 +223,11 @@ int main(int argc,char** argv)
 
 	// send grasp goal to open gripper
 	grasp_goal.goal = object_manipulation_msgs::GraspHandPostureExecutionGoal::RELEASE;
-	grasp_action_client.sendGoal(grasp_goal);
+	/* Fill Code: [ use the 'sendGoal' method of the grasp client to open gripper] */
 
 	// confirm that gripper opened
-	success = grasp_action_client.waitForResult(ros::Duration(4.0f));
+	/* Fill Code: [ use the 'waitForResult' to check and save result in success variable] */
+
 	if(success)
 	{
 		ROS_INFO_STREAM("Gripper opened");
@@ -232,8 +235,8 @@ int main(int argc,char** argv)
 	else
 	{
 		ROS_ERROR_STREAM("Gripper failure");
-		ros::shutdown();
-		return 0;
+
+		/* Fill Code: [ call the ros shutdown function and then return] */
 	}
 
 	/* =============== END OF TASK =================== */
@@ -258,10 +261,10 @@ int main(int argc,char** argv)
 	tf::StampedTransform world_to_box_pick_tf;
 
 	// use transform listener to find the box's pick pose
-	tf_listener.lookupTransform(WORLD_FRAME_ID,TAG_FRAME_ID,ros::Time(0.0f),world_to_box_pick_tf);
+	/* Fill Code: [ use the 'lookupTransform' method in the transform listener] */
 
 	// save pose in 'box_pose'
-	tf::poseTFToMsg(world_to_box_pick_tf,box_pose);
+	/* Fill Code: [ use the 'tf::poseTFToMsg' to save a transform into a pose ] */
 
 	/* =============== END OF TASK =================== */
 
@@ -290,17 +293,17 @@ int main(int argc,char** argv)
 	tf::StampedTransform tcp_to_wrist_tf;
 
 	// create tcp pose at box pick
-	world_to_tcp_tf.setOrigin(tf::Vector3(box_pose.position.x,box_pose.position.y,BOX_SIZE.getZ()/2.0f));
+	/* Fill Code: [ use the 'setOrigin' to set the position of 'world_to_tcp_tf'] */
 	world_to_tcp_tf.setRotation(tf::Quaternion(M_PI,0,M_PI_2));
 
 	// creating pick poses for tcp
 	tcp_pick_poses = create_manipulation_poses(RETREAT_DISTANCE,APPROACH_DISTANCE,world_to_tcp_tf);
 
 	// finding transform from tcp to wrist
-	tf_listener.lookupTransform(TCP_LINK_NAME,WRIST_LINK_NAME,ros::Time(0.0f),tcp_to_wrist_tf);
+	/* Fill Code: [ use the 'lookupTransform' method in the transform listener] */
 
 	// transforming tcp poses to wrist
-	wrist_pick_poses = transform_from_tcp_to_wrist(tcp_to_wrist_tf,tcp_pick_poses);
+	/* Fill Code: [ use the 'transform_from_tcp_to_wrist' function and save results into 'wrist_pick_poses'] */
 
 	// printing some results
 	ROS_INFO_STREAM("tcp position at pick: ["<<world_to_tcp_tf.getOrigin().getX()<<", "
@@ -338,19 +341,19 @@ int main(int argc,char** argv)
 	Complete code below: */
 
 	// set the wrist as the end-effector link
-	move_group.setEndEffectorLink(WRIST_LINK_NAME);
+	/* Fill Code: [ use the 'setEndEffectorLink' in the 'move_group' object] */
 
 	// set world frame as the reference
-	move_group.setPoseReferenceFrame(WORLD_FRAME_ID);
+	/* Fill Code: [ use the 'setPoseReferenceFrame' in the 'move_group' object] */
 
 	// move the robot to each wrist pick pose
 	for(unsigned int i = 0; i < wrist_pick_poses.size(); i++)
 	{
 		// set the current pose as the target
-		move_group.setPoseTarget(wrist_pick_poses[i],WRIST_LINK_NAME);
+		/* Fill Code: [ use the 'setPoseTarget' method in the 'move_group' object and pass the current pose in 'wrist_pick_poses'] */
 
 		// moving arm to current pick pose
-		success = move_group.move();
+		/* Fill Code: [ use the 'move' method in the 'move_group' object and save the result in the 'success' variable] */
 
 		// verifying move completion
 		if(success)
@@ -371,10 +374,11 @@ int main(int argc,char** argv)
 			grasp_goal.goal= object_manipulation_msgs::GraspHandPostureExecutionGoal::GRASP;
 
 			// send grasp goal to server
-			grasp_action_client.sendGoal(grasp_goal);
+			/* Fill Code: [ use the 'sendGoal' method of the grasp client to open gripper] */
+
 
 			// verify grasp completion
-			success = grasp_action_client.waitForResult(ros::Duration(4.0f));
+			/* Fill Code: [ use the 'waitForResult' method to check and save result in success variable] */
 			if(success)
 			{
 				ROS_INFO_STREAM("Gripper closed");
@@ -411,15 +415,17 @@ int main(int argc,char** argv)
 	// task variables
 	std::vector<geometry_msgs::Pose> tcp_place_poses,wrist_place_poses;
 
-	// setting box pose at place
+	// setting 'box_pose' at place
 	tf::poseTFToMsg(BOX_PLACE_TF,box_pose);
 
 	// finding tcp pose at box place
-	world_to_tcp_tf.setOrigin(tf::Vector3(box_pose.position.x,box_pose.position.y,box_pose.position.z));
-	world_to_tcp_tf.setRotation(tf::Quaternion(M_PI,0,M_PI_2));
+	/* Fill Code: [ use the 'setOrigin' to set the position of 'world_to_tcp_tf'] */
+	/* Fill Code: [ use the 'setRotation' to set the orientation of 'world_to_tcp_tf'] */
+
+
 
 	// creating place poses for tcp
-	tcp_place_poses = create_manipulation_poses(RETREAT_DISTANCE,APPROACH_DISTANCE,world_to_tcp_tf);
+	/* Fill Code: [ use the 'create_manipulation_poses' and save results to 'tcp_place_poses'] */
 
 	// transforming tcp poses to wrist
 	wrist_place_poses = transform_from_tcp_to_wrist(tcp_to_wrist_tf,tcp_place_poses);
@@ -458,7 +464,7 @@ int main(int argc,char** argv)
 	for(unsigned int i = 0; i < wrist_place_poses.size(); i++)
 	{
 		// set the current place pose as the target
-		move_group.setPoseTarget(wrist_place_poses[i],WRIST_LINK_NAME);
+		/* Fill Code: [ use the 'setPoseTarget' method in the 'move_group' object and pass the current pose in 'wrist_pick_poses'] */
 
 		// moving arm to current place pose
 		success = move_group.move();
@@ -478,7 +484,7 @@ int main(int argc,char** argv)
 		if(i == 1)
 		{
 			// set the grasp to open
-			grasp_goal.goal = object_manipulation_msgs::GraspHandPostureExecutionGoal::RELEASE;
+			/* Fill Code: [ update 'grasp_goal.goal' member] */
 
 			// send grasp goal to server
 			grasp_action_client.sendGoal(grasp_goal);
@@ -513,18 +519,7 @@ int main(int argc,char** argv)
 		-
 	Complete code below: */
 
-
-//	move_group.setNamedTarget(WAIT_POSE_NAME);
-//	if(move_group.move())
-//	{
-//		ROS_INFO_STREAM("Move " << HOME_POSE_NAME<< " Succeeded");
-//	}
-//	else
-//	{
-//		ROS_INFO_STREAM("Move " << HOME_POSE_NAME<< " Failed");
-//		ros::shutdown();
-//		return 0;
-//	}
+	/* Fill Code: [ use all needed methods to move the robot to the wait position] */
 
 
 	/* =============== END OF TASK =================== */
