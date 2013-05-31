@@ -2,7 +2,6 @@
  ** Simple ROS Node
  **/
 #include <ros/ros.h>
-#include <iostream>
 
 
 int main(int argc, char* argv[])
@@ -22,7 +21,7 @@ int main(int argc, char* argv[])
     // Loop through until the ROS system tells the user to shut down
     while(ros::ok()) {
         // Print out a message
-        ROS_INFO("We've gone through %d times.", count);
+        ROS_INFO_STREAM("We've gone through " << count << " times.");
         ++count;
         // Wait the stated duration
         loop_rate.sleep();

@@ -1,10 +1,8 @@
 <package>
   <description brief="lesson_simple_node">
-
-     lesson_simple_node
-
+  A Simple ROS Node
   </description>
-  <author>Ian R. Meinzen</author>
+  <author>A Generic User</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/lesson_simple_node</url>
