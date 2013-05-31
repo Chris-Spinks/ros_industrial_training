@@ -16,12 +16,12 @@
   <link name="ee_base" >
     <visual>
       <geometry>
-        <mesh filename="package://lesson_advanced_launch/models/puzzle_mount_visual.dae" />
+        <mesh filename="package://lesson_debug/models/puzzle_mount_visual.dae" />
       </geometry>>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://lesson_advanced_launch/models/puzzle_mount_collision.dae" />
+        <mesh filename="package://lesson_debug/models/puzzle_mount_collision.dae" />
       </geometry>
     </collision>
   </link>

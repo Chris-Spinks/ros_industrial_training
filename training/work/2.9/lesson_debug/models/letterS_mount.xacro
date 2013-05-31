@@ -9,19 +9,19 @@
   <joint name="tool0-ee_base" type="fixed" >
     <parent link="tool0" />
     <child link="ee_base" />
-    <origin xyz="0 0 0" rpy="0 0 0" />
+    <origin xyz="0.0127 0 0" rpy="0 0 0" />
   </joint>  
 
   <!-- link "ee_base" and connected joints-->
   <link name="ee_base" >
     <visual>
       <geometry>
-        <mesh filename="package://lesson_debug/models/puzzle_mount_visual.dae" />
+        <mesh filename="package://lesson_debug/models/letterS_mount_visual.dae" />
       </geometry>>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://lesson_debug/models/puzzle_mount_collision.dae" />
+        <mesh filename="package://lesson_debug/models/letterS_mount_collision.dae" />
       </geometry>
     </collision>
   </link>
@@ -31,7 +31,7 @@
   <joint name="ee_base-tool1" type="fixed" >
     <parent link="ee_base" />
     <child link="tool1" />
-    <origin xyz="0.0381 0.0 -0.011" rpy="${-150*deg} 0 ${90*deg}" />
+    <origin xyz="0.0680 -0.0032 0" rpy="${30*deg} ${90*deg} ${-90*deg}" />
   </joint>
 
 </robot>

@@ -21,7 +21,7 @@
 	<xacro:sia20d_mesh prefix=""/>
 
 	<!-- arm-workcell joint definitions -->
-	<joint name="wordl_to_base" type="fixed">
+	<joint name="world_to_base" type="fixed">
 		<parent link="world_frame"/>
 		<child link="base_link"/>
 		<origin xyz="0.241 0 0" rpy="0 0 0"/>
