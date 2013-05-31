@@ -22,8 +22,6 @@
   
   <!-- sensor setup -->
   <include unless="$(arg sim)" file="$(find sensor_config)/launch/ur5_sensor_setup.launch"/>
-  <node if="$(arg sim)" pkg="tf" type="static_transform_publisher" 
-	name="world_to_tag" args="-0.8 0.2 0.17 0 0 0 world_frame ar_tag 1"/>	
   
 
   <!-- ar tag detection node -->	
@@ -37,6 +35,10 @@
 	<param name="marker_pattern_list" type="string" value="$(find ar_pose)/data/target_info"/>
 	<param name="threshold" type="int" value="100"/>
   </node>
+
+  <!-- static frame publisher for simulation -->
+  <node if="$(arg sim)" pkg="tf" type="static_transform_publisher" 
+	name="world_to_tag" args="-0.8 0.2 0.17 0 0 0 world_frame ar_tag 1"/>	
 
 
   <!-- rviz -->
