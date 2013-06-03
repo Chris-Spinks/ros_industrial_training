@@ -14,6 +14,8 @@
   <depend package="actionlib_msgs"/>
   <depend package="actionlib"/>
   <depend package="industrial_utils"/>
+  <depend package="industrial_robot_client"/>
+  <depend package="industrial_robot_simulator"/>
 
 </package>
 
