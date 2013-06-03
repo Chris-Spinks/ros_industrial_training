@@ -1,6 +1,4 @@
 <?xml version="1.0" ?>
-<launch>
-	<!-- sensor setup -->
-	<include file="$(find sensor_config)/launch/ur5_sensor_setup.launch"/>		
+<launch>	
 
 </launch>
