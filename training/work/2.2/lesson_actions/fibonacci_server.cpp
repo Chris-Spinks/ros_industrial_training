@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
-//include <lesson_actions/FibonacciAction.h>
+//#include <lesson_actions/FibonacciAction.h>
 
 class FibonacciAction
 {
@@ -8,7 +8,7 @@ protected:
 
   ros::NodeHandle nh_;
   
-//  actionlib::SimpleActionServer<learning_actionlib::FibonacciAction> as_; 
+//  actionlib::SimpleActionServer<lesson_actions::FibonacciAction> as_; 
   std::string action_name_;
   
 //  lesson_actions::FibonacciFeedback feedback_;
@@ -25,7 +25,7 @@ public:
 
   ~FibonacciAction(void) {}
 
-  void executeCB(const learning_actionlib::FibonacciGoalConstPtr &goal)
+  void executeCB(const lesson_actions::FibonacciGoalConstPtr &goal)
   {
     ros::Rate r(1);
     bool success = true;

@@ -15,7 +15,7 @@ int main (int argc, char **argv)
 
   ROS_INFO("Action server started, sending goal.");
   // send a goal to the action
-//  learning_actionlib::FibonacciGoal goal;
+//  lesson_actions::FibonacciGoal goal;
 //  goal.order = 20;
 //  ac.sendGoal(goal);
 
