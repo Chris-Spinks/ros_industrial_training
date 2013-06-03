@@ -38,7 +38,6 @@
 typedef actionlib::SimpleActionClient<object_manipulation_msgs::GraspHandPostureExecutionAction> GraspActionClient;
 
 
-
 // =============================== program constants ===============================
 static const std::string GRASP_ACTION_SERVICE = "grasp_execution_action";
 
@@ -259,7 +258,7 @@ void task_create_pick_moves(tf::TransformListener &tf_listener)
 	tcp_pick_poses = create_manipulation_poses(RETREAT_DISTANCE,APPROACH_DISTANCE,world_to_tcp_tf);
 
 	// finding transform from tcp to wrist
-	tf_listener.lookupTransform(TCP_LINK_NAME,WAIT_POSE_NAME,ros::Time(0.0f),tcp_to_wrist_tf);
+	tf_listener.lookupTransform(TCP_LINK_NAME,WRIST_LINK_NAME,ros::Time(0.0f),tcp_to_wrist_tf);
 
 	// transforming tcp poses to wrist
 	/* Fill Code: [ use the 'transform_from_tcp_to_wrist' function and save results into 'wrist_pick_poses'] */
