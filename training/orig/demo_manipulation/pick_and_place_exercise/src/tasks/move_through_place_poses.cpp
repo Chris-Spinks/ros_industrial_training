@@ -50,6 +50,8 @@ void move_through_place_poses(move_group_interface::MoveGroup& move_group,GraspA
     // turn off gripper suction (RELEASE) after reaching target pose
     if(i == 1)
     {
+
+      /* Fill Code: [ use the 'set_gripper' function with the appropriate arguments] */
       set_gripper(grasp_action_client, false);
     }
   }
