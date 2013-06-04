@@ -28,14 +28,3 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
-
-rosbuild_add_executable(pick_and_place_node src/nodes/pick_and_place_node.cpp
-	src/tasks/move_to_wait_position.cpp
-	src/tasks/set_gripper.cpp
-	src/tasks/detect_box_pick.cpp
-	src/tasks/create_pick_moves.cpp
-	src/tasks/move_through_pick_poses.cpp
-	src/tasks/create_place_moves.cpp
-	src/tasks/move_through_place_poses.cpp
-	src/utilities/pick_and_place_utilities.cpp)
-
