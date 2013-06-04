@@ -23,7 +23,7 @@
 */
 std::vector<geometry_msgs::Pose> create_pick_moves(tf::TransformListener &tf_listener, geometry_msgs::Pose &box_pose)
 {
-  ROS_ERROR_STREAM("create_pick_moves is not implemented yet.  Aborting.");
+  ROS_ERROR_STREAM("create_pick_moves is not implemented yet.  Aborting."); exit(1);
 
   // task variables
   tf::Transform world_to_tcp_tf;

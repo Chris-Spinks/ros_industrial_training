@@ -24,7 +24,7 @@
 
 std::vector<geometry_msgs::Pose> create_place_moves(tf::TransformListener& tf_listener)
 {
-  //ROS_ERROR_STREAM("create_place_moves is not implemented yet.  Aborting.");
+  //ROS_ERROR_STREAM("create_place_moves is not implemented yet.  Aborting."); exit(1);
 
   // task variables
   tf::Transform world_to_tcp_tf;

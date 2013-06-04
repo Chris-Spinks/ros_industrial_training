@@ -15,7 +15,7 @@
 */
 void set_gripper(GraspActionClient& grasp_action_client, bool do_grasp)
 {
-  //ROS_ERROR_STREAM("set_gripper is not implemented yet.  Aborting.");
+  //ROS_ERROR_STREAM("set_gripper is not implemented yet.  Aborting."); exit(1);
 
   // task variables
   object_manipulation_msgs::GraspHandPostureExecutionGoal grasp_goal;

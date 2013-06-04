@@ -19,7 +19,7 @@
 
 void move_to_wait_position(move_group_interface::MoveGroup& move_group)
 {
-  //ROS_ERROR_STREAM("move_to_wait_position is not implemented yet.  Aborting.");
+  //ROS_ERROR_STREAM("move_to_wait_position is not implemented yet.  Aborting."); exit(1);
 
   // task variables
   bool success; // saves the move result

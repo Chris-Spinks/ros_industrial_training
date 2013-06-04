@@ -18,7 +18,7 @@
 void move_through_place_poses(move_group_interface::MoveGroup& move_group,GraspActionClient& grasp_action_client,
                               std::vector<geometry_msgs::Pose>& place_poses)
 {
-  ROS_ERROR_STREAM("move_through_place_poses is not implemented yet.  Aborting.");
+  ROS_ERROR_STREAM("move_through_place_poses is not implemented yet.  Aborting."); exit(1);
 
   // task variables
   object_manipulation_msgs::GraspHandPostureExecutionGoal grasp_goal;

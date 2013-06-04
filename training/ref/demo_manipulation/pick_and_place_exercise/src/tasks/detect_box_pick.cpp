@@ -19,7 +19,7 @@
 */
 geometry_msgs::Pose detect_box_pick(tf::TransformListener &tf_listener)
 {
-  //ROS_ERROR_STREAM("detect_box_pick is not implemented yet.  Aborting.");
+  //ROS_ERROR_STREAM("detect_box_pick is not implemented yet.  Aborting."); exit(1);
 
   // task variables
   tf::StampedTransform world_to_box_pick_tf;
