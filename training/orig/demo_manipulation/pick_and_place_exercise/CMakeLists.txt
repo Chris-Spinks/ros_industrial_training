@@ -39,4 +39,3 @@ rosbuild_add_executable(pick_and_place_node src/nodes/pick_and_place_node.cpp
 	src/tasks/move_through_place_poses.cpp
 	src/utilities/pick_and_place_utilities.cpp)
 
-rosbuild_add_executable(my_pick_and_place_node src/nodes/pick_and_place_exercise.cpp)
