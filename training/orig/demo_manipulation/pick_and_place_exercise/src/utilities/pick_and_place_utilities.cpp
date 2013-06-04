@@ -14,7 +14,7 @@ using namespace tf;
 // =============================== Utility functions ===============================
 
 std::vector<geometry_msgs::Pose> create_manipulation_poses(double retreat_dis,double approach_dis,const tf::Transform &target_tf)
-    {
+{
   geometry_msgs::Pose start_pose, target_pose, end_pose;
   std::vector<geometry_msgs::Pose> poses;
 
@@ -33,11 +33,10 @@ std::vector<geometry_msgs::Pose> create_manipulation_poses(double retreat_dis,do
   poses.push_back(end_pose);
 
   return poses;
-
-    }
+}
 
 std::vector<geometry_msgs::Pose> transform_from_tcp_to_wrist(tf::Transform tcp_to_wrist_tf,const std::vector<geometry_msgs::Pose> tcp_poses)
-    {
+{
   // array for poses of the wrist
   std::vector<geometry_msgs::Pose> wrist_poses;
   wrist_poses.resize(tcp_poses.size());
@@ -53,7 +52,7 @@ std::vector<geometry_msgs::Pose> transform_from_tcp_to_wrist(tf::Transform tcp_t
   }
 
   return wrist_poses;
-    }
+}
 
 std::ostream& operator<<(std::ostream& os, const tf::Vector3 vec)
 {

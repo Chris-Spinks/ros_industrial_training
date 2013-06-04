@@ -20,7 +20,7 @@ int main(int argc,char** argv)
   /*	INITIALIZING ROS NODE
       Goal:
       - Observe all steps needed to properly initialize a ros node.
-      - Look into the 'read_ros_parameters' function to take notice of the parameters that
+      - Look into the 'cfg' global var to take notice of the parameters that
         are available for the rest of the program. */
   /* =========================================================================================*/
 
@@ -46,7 +46,7 @@ int main(int argc,char** argv)
   move_group_interface::MoveGroup move_group(cfg.ARM_GROUP_NAME);
 
   // grasp action client initialization
-  GraspActionClient grasp_action_client(cfg.GRASP_ACTION_SERVICE,true);
+  GraspActionClient grasp_action_client(cfg.GRASP_ACTION_NAME,true);
 
   // waiting to establish connections
   while(ros::ok() &&
@@ -57,21 +57,31 @@ int main(int argc,char** argv)
 
 
   /* ========================================*/
+  /* Pick & Place Tasks                      */
+  /* ========================================*/
 
+  // move to a "clear" position
   move_to_wait_position(move_group);
 
+  // open the gripper (suction off)
   set_gripper(grasp_action_client, false);
 
+  // get the box position from perception node
   box_pose = detect_box_pick(tf_listener);
 
+  // build a sequence of poses to "Pick" the box
   pick_poses = create_pick_moves(tf_listener, box_pose);
 
+  // plan/execute the sequence of "pick" moves
   move_through_pick_poses(move_group,grasp_action_client,pick_poses);
 
+  // build a sequence of poses to "Place" the box
   place_poses = create_place_moves(tf_listener);
 
+  // plan/execute the "place" moves
   move_through_place_poses(move_group,grasp_action_client,place_poses);
 
+  // move back to the "clear" position
   move_to_wait_position(move_group);
 
   return 0;

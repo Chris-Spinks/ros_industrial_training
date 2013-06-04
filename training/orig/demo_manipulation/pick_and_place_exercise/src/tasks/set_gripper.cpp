@@ -7,21 +7,22 @@
 
 #include <pick_and_place_exercise/pick_and_place.h>
 
+/*    SET GRIPPER
+  Goal:
+    - Use the grasp action client to open or close the gripper.
+    - Confirm that the gripper was successfully opened or closed.  Exit program on failure;
+  Hints:
+*/
 void set_gripper(GraspActionClient& grasp_action_client, bool do_grasp)
 {
-  /*	SET GRIPPER
-    Goal:
-      - Use the grasp action client to open or close the gripper.
-      - Confirm that the gripper was successfully opened or closed.  Exit program on failure;
-    Hints:
-		-
-  Complete code below: */
+  //ROS_ERROR_STREAM("set_gripper is not implemented yet.  Aborting.");
 
   // task variables
   object_manipulation_msgs::GraspHandPostureExecutionGoal grasp_goal;
   bool success;
 
   // send grasp goal to open gripper
+  /* Fill Code: [ set the "suction off" goal using the correct GraspHandPostureExecutionGoal constant ] */
   if (do_grasp)
     grasp_goal.goal = object_manipulation_msgs::GraspHandPostureExecutionGoal::GRASP;
   else
@@ -32,6 +33,7 @@ void set_gripper(GraspActionClient& grasp_action_client, bool do_grasp)
 
   // confirm that gripper opened
   /* Fill Code: [ use the 'waitForResult' to check and save result in success variable] */
+  /*   - can you specify a timeout for the wait command? */
   success = grasp_action_client.waitForResult(ros::Duration(4.0f));
 
   if(success)
@@ -44,8 +46,6 @@ void set_gripper(GraspActionClient& grasp_action_client, bool do_grasp)
   else
   {
     ROS_ERROR_STREAM("Gripper failure");
-
-    /* Fill Code: [ call the ros shutdown function and then return] */
     exit(1);
   }
 }
