@@ -19,7 +19,7 @@
 */
 geometry_msgs::Pose detect_box_pick(tf::TransformListener &tf_listener)
 {
-  //ROS_ERROR_STREAM("detect_box_pick is not implemented yet.  Aborting.");
+  ROS_ERROR_STREAM("detect_box_pick is not implemented yet.  Aborting.");
 
   // task variables
   tf::StampedTransform world_to_box_pick_tf;
@@ -27,11 +27,11 @@ geometry_msgs::Pose detect_box_pick(tf::TransformListener &tf_listener)
 
   // use transform listener to find the box's pick pose (relative to world frame)
   /* Fill Code: [ use the 'lookupTransform' method in the transform listener] */
-  tf_listener.lookupTransform(cfg.WORLD_FRAME_ID,cfg.TAG_FRAME_ID,ros::Time(0.0f),world_to_box_pick_tf);
+
 
   // save pose in 'box_pose'
   /* Fill Code: [ use the 'tf::poseTFToMsg' to convert a TF transform into a pose message] */
-  tf::poseTFToMsg(world_to_box_pick_tf,box_pose);
+
 
   return box_pose;
 }

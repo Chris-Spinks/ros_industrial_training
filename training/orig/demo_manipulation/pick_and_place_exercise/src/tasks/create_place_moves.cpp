@@ -24,7 +24,7 @@
 
 std::vector<geometry_msgs::Pose> create_place_moves(tf::TransformListener& tf_listener)
 {
-  //ROS_ERROR_STREAM("create_place_moves is not implemented yet.  Aborting.");
+  ROS_ERROR_STREAM("create_place_moves is not implemented yet.  Aborting.");
 
   // task variables
   tf::Transform world_to_tcp_tf;
@@ -36,20 +36,19 @@ std::vector<geometry_msgs::Pose> create_place_moves(tf::TransformListener& tf_li
   /*   - BOX_PLACE_TF is a tf::Transform, which has a getOrigin() method */
   /* Fill Code: [ use the 'setRotation' to set the orientation of 'world_to_tcp_tf'] */
   /*   - use the same "pointing down" orientation as in create_pick_moves() */
-  world_to_tcp_tf.setOrigin(cfg.BOX_PLACE_TF.getOrigin());
-  world_to_tcp_tf.setRotation(tf::Quaternion(M_PI, 0, M_PI/2.0f));
+
 
   // create place poses for tcp
   /* Fill Code: [ use the 'create_manipulation_poses' and save results to 'tcp_place_poses'] */
-  tcp_place_poses = create_manipulation_poses(cfg.RETREAT_DISTANCE, cfg.APPROACH_DISTANCE, world_to_tcp_tf);
+
 
   // find transform from tcp to wrist (in TCP frame)
   /* Fill Code: [ use the 'lookupTransform' method in the transform listener] */
-  tf_listener.lookupTransform(cfg.TCP_LINK_NAME, cfg.WRIST_LINK_NAME, ros::Time(0.0f), tcp_to_wrist_tf);
+
 
   // transform list of pick positions from TCP frame to wrist frame
   /* Fill Code: [ use the 'transform_from_tcp_to_wrist' function and save results into 'wrist_place_poses'] */
-  wrist_place_poses = transform_from_tcp_to_wrist(tcp_to_wrist_tf, tcp_place_poses);
+
 
   // printing results
   ROS_INFO_STREAM("tcp position at place: " << world_to_tcp_tf.getOrigin());

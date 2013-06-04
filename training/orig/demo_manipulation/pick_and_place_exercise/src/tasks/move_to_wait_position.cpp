@@ -19,18 +19,18 @@
 
 void move_to_wait_position(move_group_interface::MoveGroup& move_group)
 {
-  //ROS_ERROR_STREAM("move_to_wait_position is not implemented yet.  Aborting.");
+  ROS_ERROR_STREAM("move_to_wait_position is not implemented yet.  Aborting.");
 
   // task variables
   bool success; // saves the move result
 
   // set robot wait target
   /* Fill Code: [ use the 'setNamedTarget' method in the 'move_group' object] */
-  move_group.setNamedTarget(cfg.WAIT_POSE_NAME);
+
 
   // move the robot
   /* Fill Code: [ use the 'move' method in the 'move_group' object and save the result in the 'success' variable] */
-  success = move_group.move();
+
   if(success)
   {
     ROS_INFO_STREAM("Move " << cfg.WAIT_POSE_NAME<< " Succeeded");

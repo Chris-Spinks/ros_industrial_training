@@ -22,7 +22,7 @@
 void move_through_pick_poses(move_group_interface::MoveGroup& move_group, GraspActionClient& grasp_action_client,
                              std::vector<geometry_msgs::Pose>& pick_poses)
 {
-  //ROS_ERROR_STREAM("move_through_pick_poses is not implemented yet.  Aborting.");
+  ROS_ERROR_STREAM("move_through_pick_poses is not implemented yet.  Aborting.");
 
   // task variables
   object_manipulation_msgs::GraspHandPostureExecutionGoal grasp_goal;
@@ -32,24 +32,24 @@ void move_through_pick_poses(move_group_interface::MoveGroup& move_group, GraspA
   //   - the robot will try to move this link to the specified position
   //   - if not specified, MoveIt will use the last link in the arm group
   /* Fill Code: [ use the 'setEndEffectorLink' in the 'move_group' object] */
-  move_group.setEndEffectorLink(cfg.WRIST_LINK_NAME);
+
 
   // set world frame as the reference
   //   - the target position is specified relative to this frame
   //   - if not specified, MoveIt will use the parent frame of the SRDF "Virtual Joint"
   /* Fill Code: [ use the 'setPoseReferenceFrame' in the 'move_group' object] */
-  move_group.setPoseReferenceFrame(cfg.WORLD_FRAME_ID);
+
 
   // move the robot to each wrist pick pose
   for(unsigned int i = 0; i < pick_poses.size(); i++)
   {
     // set the current pose as the target
     /* Fill Code: [ use the 'setPoseTarget' method in the 'move_group' object and pass the current pose in 'pick_poses'] */
-    move_group.setPoseTarget(pick_poses[i]);
+
 
     // moving arm to current pick pose
     /* Fill Code: [ use the 'move' method in the 'move_group' object and save the result in the 'success' variable] */
-    success = move_group.move();
+
 
     // verifying move completion
     if(success)
@@ -63,10 +63,10 @@ void move_through_pick_poses(move_group_interface::MoveGroup& move_group, GraspA
     }
 
     // turn on gripper suction after approach pose
-    /* Fill Code: [ call the 'set_gripper' function to turn on suction ] */
     if(i == 0)
     {
-      set_gripper(grasp_action_client, true);
+      /* Fill Code: [ call the 'set_gripper' function to turn on suction ] */
+
     }
 
   }
