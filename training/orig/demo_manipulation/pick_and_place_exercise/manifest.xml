@@ -17,7 +17,8 @@
   <depend package="roscpp"/>
   <depend package="object_manipulation_msgs"/>
   <depend package="actionlib"/>
-
+  <depend package="industrial_robot_client" />
+  <depend package="industrial_robot_simulator" />
 </package>
 
 
